@@ -24,22 +24,15 @@
  */
 package org.spongepowered.common.interfaces;
 
-import com.google.common.collect.ImmutableList;
-import org.spongepowered.api.world.gen.GeneratorPopulator;
+import net.minecraft.world.chunk.IChunkProvider;
+import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.world.gen.Populator;
 
-import net.minecraft.world.storage.WorldInfo;
-import org.spongepowered.common.configuration.SpongeConfig;
+import java.util.List;
+import java.util.Random;
 
-public interface IMixinWorld extends IPopulatorOwner {
+public interface IFlaggedPopulator extends Populator {
 
-    SpongeConfig<SpongeConfig.WorldConfig> getWorldConfig();
-
-    ImmutableList<Populator> getPopulators();
-
-    ImmutableList<GeneratorPopulator> getGeneratorPopulators();
-
-    void updateWorldGenerator();
-    
-    IChunkProvider createChunkProvider(net.minecraft.world.World world, GeneratorPopulator generatorPopulator, BiomeGenerator biomeGenerator);
+    void populate(IChunkProvider provider, Chunk chunk, Random rand, List<String> flags);
 
 }

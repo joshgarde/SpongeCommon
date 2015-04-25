@@ -22,24 +22,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.interfaces;
+package org.spongepowered.common.world.gen.populators;
 
-import com.google.common.collect.ImmutableList;
-import org.spongepowered.api.world.gen.GeneratorPopulator;
+import org.spongepowered.api.world.gen.Populator;
 
-import net.minecraft.world.storage.WorldInfo;
-import org.spongepowered.common.configuration.SpongeConfig;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.SpawnerAnimals;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
+import org.spongepowered.api.world.Chunk;
 
-public interface IMixinWorld extends IPopulatorOwner {
+import java.util.Random;
 
-    SpongeConfig<SpongeConfig.WorldConfig> getWorldConfig();
+public class AnimalPopulator implements Populator {
 
-    ImmutableList<Populator> getPopulators();
+    @Override
+    public void populate(Chunk chunk, Random random) {
+        World worldObj = (World) chunk.getWorld();
+        BlockPos blockpos = new BlockPos(chunk.getBlockMin().getX(), 0, chunk.getBlockMin().getZ());
+        int x = chunk.getPosition().getX();
+        int z = chunk.getPosition().getZ();
+        BiomeGenBase biomegenbase = worldObj.getBiomeGenForCoords(blockpos.add(16, 0, 16));
 
-    ImmutableList<GeneratorPopulator> getGeneratorPopulators();
-
-    void updateWorldGenerator();
-    
-    IChunkProvider createChunkProvider(net.minecraft.world.World world, GeneratorPopulator generatorPopulator, BiomeGenerator biomeGenerator);
+        SpawnerAnimals.performWorldGenSpawning(worldObj, biomegenbase, x * 16 + 8, z * 16 + 8, 16, 16, random);
+    }
 
 }

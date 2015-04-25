@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.registry;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.spongepowered.common.world.gen.builders.SpongePopulatorFactory;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
@@ -479,6 +479,8 @@ public abstract class SpongeGameRegistry implements GameRegistry {
     public final Map<String, SpongeDisplaySlot> displaySlotMappings = Maps.newLinkedHashMap();
     public final Map<String, Criterion> criteriaMap = Maps.newHashMap();
     private final Map<String, SelectorType> selectorMappings = Maps.newHashMap();
+    
+    private final SpongePopulatorFactory populatorFactory = new SpongePopulatorFactory();
 
     private final Map<String, NotePitch> notePitchMappings = Maps.newHashMap();
     private final Map<String, SkullType> skullTypeMappings = Maps.newHashMap();
@@ -2036,7 +2038,7 @@ public abstract class SpongeGameRegistry implements GameRegistry {
 
     @Override
     public PopulatorFactory getPopulatorFactory() {
-        throw new UnsupportedOperationException(); // TODO
+        return this.populatorFactory;
     }
 
     public void preInit() {
