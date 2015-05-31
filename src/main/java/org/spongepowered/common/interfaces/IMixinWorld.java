@@ -25,8 +25,11 @@
 package org.spongepowered.common.interfaces;
 
 import com.google.common.collect.ImmutableList;
-import org.spongepowered.api.world.gen.GeneratorPopulator;
+import org.spongepowered.common.interfaces.gen.IPopulatorOwner;
 
+import net.minecraft.world.chunk.IChunkProvider;
+import org.spongepowered.api.world.gen.BiomeGenerator;
+import org.spongepowered.api.world.gen.GeneratorPopulator;
 import net.minecraft.world.storage.WorldInfo;
 import org.spongepowered.common.configuration.SpongeConfig;
 

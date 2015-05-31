@@ -1,7 +1,7 @@
 /*
  * This file is part of Sponge, licensed under the MIT License (MIT).
  *
- * Copyright (c) SpongePowered.org <http://www.spongepowered.org>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
  * Copyright (c) contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,27 +22,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.mixin.core.world.biome;
+package org.spongepowered.common.interfaces.gen;
 
-import org.spongepowered.common.interfaces.gen.IBiomeGenPlains;
+import net.minecraft.world.chunk.IChunkProvider;
+import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.world.gen.Populator;
 
-import net.minecraft.world.biome.BiomeGenPlains;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import java.util.List;
+import java.util.Random;
 
-@Mixin(BiomeGenPlains.class)
-public abstract class MixinBiomeGenPlains extends MixinBiomeGenBase implements IBiomeGenPlains {
-    
-    @Shadow protected boolean field_150628_aC;
+public interface IFlaggedPopulator extends Populator {
 
-    @Override
-    protected void buildPopulators() {
-        //this.populators.add(new PlainsGrassPopulator());
-        super.buildPopulators();
-    }
-    
-    @Override
-    public boolean hasSunflowers() {
-        return this.field_150628_aC;
-    }
+    void populate(IChunkProvider provider, Chunk chunk, Random rand, List<String> flags);
+
 }

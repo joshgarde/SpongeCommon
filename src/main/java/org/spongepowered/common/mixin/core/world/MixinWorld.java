@@ -25,7 +25,6 @@
 package org.spongepowered.common.mixin.core.world;
 
 import org.spongepowered.common.world.gen.CustomChunkProviderGenerate;
-
 import org.spongepowered.common.world.gen.SpongeGeneratorPopulator;
 import org.spongepowered.common.world.gen.SpongeBiomeGenerator;
 import org.spongepowered.common.world.gen.CustomWorldChunkManager;
