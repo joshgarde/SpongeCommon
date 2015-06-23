@@ -53,7 +53,7 @@ public abstract class MixinWorldGenIcePath implements IcePath {
     @Inject(method = "<init>(I)V", at = @At("RETURN"))
     public void onConstructed(int radius, CallbackInfo ci) {
         this.radius = VariableAmount.baseWithRandomAddition(2, radius > 2 ? radius - 2 : 1);
-        this.sections = VariableAmount.fixed(3);
+        this.sections = VariableAmount.fixed(2);
     }
 
     @Override

@@ -94,50 +94,42 @@ public class SpongePopulatorFactory implements PopulatorFactory {
 
     @Override
     public Forest.Builder createForestPopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new ForestBuilder();
     }
 
     @Override
     public Glowstone.Builder createGlowstonePopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new GlowstoneBuilder();
     }
 
     @Override
     public HugeTree.Builder createHugeTreePopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new HugeTreeBuilder();
     }
 
     @Override
     public IcePath.Builder createIcePathPopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new IcePathBuilder();
     }
 
     @Override
     public IceSpike.Builder createIceSpikePopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new IceSpikeBuilder();
     }
 
     @Override
     public Lake.Builder createLakePopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new LakeBuilder();
     }
 
     @Override
     public Melons.Builder createMelonPopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new MelonBuilder();
     }
 
     @Override
     public Ore.Builder createOrePopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new OreBuilder();
     }
 
     @Override

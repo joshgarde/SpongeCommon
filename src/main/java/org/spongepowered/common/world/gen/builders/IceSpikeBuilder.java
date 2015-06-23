@@ -25,59 +25,59 @@
 package org.spongepowered.common.world.gen.builders;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import net.minecraft.init.Blocks;
-import net.minecraft.world.gen.feature.WorldGenSpikes;
+import net.minecraft.world.gen.feature.WorldGenIceSpike;
 import org.spongepowered.api.util.VariableAmount;
-import org.spongepowered.api.world.gen.populator.EnderCrystalPlatform;
-import org.spongepowered.api.world.gen.populator.EnderCrystalPlatform.Builder;
+import org.spongepowered.api.world.gen.populator.IceSpike;
+import org.spongepowered.api.world.gen.populator.IceSpike.Builder;
 
 
-public class EnderCrystalPlatformBuilder implements EnderCrystalPlatform.Builder {
+public class IceSpikeBuilder implements IceSpike.Builder {
     
-    private double chance;
     private VariableAmount height;
-    private VariableAmount radius;
-    
-    public EnderCrystalPlatformBuilder() {
+    private double extremeChance;
+    private VariableAmount extremeIncrease;
+
+    public IceSpikeBuilder() {
         reset();
     }
 
     @Override
-    public Builder chance(double p) {
+    public Builder height(VariableAmount height) {
+        this.height = checkNotNull(height, "height");
+        return this;
+    }
+
+    @Override
+    public Builder extremeSpikeProbability(double p) {
         checkArgument(Double.isNaN(p), "The probability must be a number.");
         checkArgument(Double.isInfinite(p), "The probability cannot be infinite.");
-        this.chance = p;
+        this.extremeChance = p;
         return this;
     }
 
     @Override
-    public Builder height(VariableAmount height) {
-        this.height = height;
-        return this;
-    }
-
-    @Override
-    public Builder radius(VariableAmount radius) {
-        this.radius = radius;
+    public Builder extremeSpikeIncrease(VariableAmount increase) {
+        this.extremeIncrease = checkNotNull(increase, "increase");
         return this;
     }
 
     @Override
     public Builder reset() {
-        this.chance = 0.2;
-        this.radius = VariableAmount.baseWithRandomAddition(1, 4);
-        this.height = VariableAmount.baseWithRandomAddition(6, 32);
+        this.height = VariableAmount.baseWithRandomAddition(7, 4);
+        this.extremeChance = 1 / 60d;
+        this.extremeIncrease = VariableAmount.baseWithRandomAddition(10, 30);
         return this;
     }
 
     @Override
-    public EnderCrystalPlatform build() throws IllegalStateException {
-        EnderCrystalPlatform populator = (EnderCrystalPlatform) new WorldGenSpikes(Blocks.end_stone);
-        populator.setSpawnProbability(this.chance);
-        populator.setHeight(this.height);
-        populator.setRadius(this.radius);
-        return populator;
+    public IceSpike build() throws IllegalStateException {
+        IceSpike pop = (IceSpike) new WorldGenIceSpike();
+        pop.setHeight(this.height);
+        pop.setExtremeSpikeProbability(this.extremeChance);
+        pop.setExtremeSpikeIncrease(this.extremeIncrease);
+        return pop;
     }
 
 }

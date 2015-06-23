@@ -25,22 +25,28 @@
 package org.spongepowered.common.world.gen.builders;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import net.minecraft.init.Blocks;
-import net.minecraft.world.gen.feature.WorldGenSpikes;
-import org.spongepowered.api.util.VariableAmount;
-import org.spongepowered.api.world.gen.populator.EnderCrystalPlatform;
-import org.spongepowered.api.world.gen.populator.EnderCrystalPlatform.Builder;
+import net.minecraft.block.Block;
+import net.minecraft.world.gen.feature.WorldGenLakes;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.world.gen.populator.Lake;
+import org.spongepowered.api.world.gen.populator.Lake.Builder;
 
+public class LakeBuilder implements Lake.Builder {
 
-public class EnderCrystalPlatformBuilder implements EnderCrystalPlatform.Builder {
-    
+    private BlockState liquid;
     private double chance;
-    private VariableAmount height;
-    private VariableAmount radius;
-    
-    public EnderCrystalPlatformBuilder() {
+
+    public LakeBuilder() {
         reset();
+    }
+
+    @Override
+    public Builder liquidType(BlockState liquid) {
+        this.liquid = checkNotNull(liquid, "liquid");
+        return this;
     }
 
     @Override
@@ -52,32 +58,18 @@ public class EnderCrystalPlatformBuilder implements EnderCrystalPlatform.Builder
     }
 
     @Override
-    public Builder height(VariableAmount height) {
-        this.height = height;
-        return this;
-    }
-
-    @Override
-    public Builder radius(VariableAmount radius) {
-        this.radius = radius;
-        return this;
-    }
-
-    @Override
     public Builder reset() {
-        this.chance = 0.2;
-        this.radius = VariableAmount.baseWithRandomAddition(1, 4);
-        this.height = VariableAmount.baseWithRandomAddition(6, 32);
+        this.liquid = BlockTypes.WATER.getDefaultState();
+        this.chance = 1 / 20d;
         return this;
     }
 
     @Override
-    public EnderCrystalPlatform build() throws IllegalStateException {
-        EnderCrystalPlatform populator = (EnderCrystalPlatform) new WorldGenSpikes(Blocks.end_stone);
-        populator.setSpawnProbability(this.chance);
-        populator.setHeight(this.height);
-        populator.setRadius(this.radius);
-        return populator;
+    public Lake build() throws IllegalStateException {
+        Lake pop = (Lake) new WorldGenLakes((Block) this.liquid.getType());
+        pop.setLiquidType(this.liquid);
+        pop.setLakeProbability(this.chance);
+        return pop;
     }
 
 }

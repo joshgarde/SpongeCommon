@@ -24,60 +24,48 @@
  */
 package org.spongepowered.common.world.gen.builders;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import net.minecraft.init.Blocks;
-import net.minecraft.world.gen.feature.WorldGenSpikes;
+import net.minecraft.world.gen.feature.WorldGenIcePath;
 import org.spongepowered.api.util.VariableAmount;
-import org.spongepowered.api.world.gen.populator.EnderCrystalPlatform;
-import org.spongepowered.api.world.gen.populator.EnderCrystalPlatform.Builder;
+import org.spongepowered.api.world.gen.populator.IcePath;
+import org.spongepowered.api.world.gen.populator.IcePath.Builder;
 
 
-public class EnderCrystalPlatformBuilder implements EnderCrystalPlatform.Builder {
+public class IcePathBuilder implements IcePath.Builder {
     
-    private double chance;
-    private VariableAmount height;
     private VariableAmount radius;
+    private VariableAmount count;
     
-    public EnderCrystalPlatformBuilder() {
+    public IcePathBuilder() {
         reset();
     }
 
     @Override
-    public Builder chance(double p) {
-        checkArgument(Double.isNaN(p), "The probability must be a number.");
-        checkArgument(Double.isInfinite(p), "The probability cannot be infinite.");
-        this.chance = p;
-        return this;
-    }
-
-    @Override
-    public Builder height(VariableAmount height) {
-        this.height = height;
-        return this;
-    }
-
-    @Override
     public Builder radius(VariableAmount radius) {
-        this.radius = radius;
+        this.radius = checkNotNull(radius);
+        return this;
+    }
+
+    @Override
+    public Builder perChunk(VariableAmount sections) {
+        this.count = checkNotNull(sections);
         return this;
     }
 
     @Override
     public Builder reset() {
-        this.chance = 0.2;
-        this.radius = VariableAmount.baseWithRandomAddition(1, 4);
-        this.height = VariableAmount.baseWithRandomAddition(6, 32);
+        this.radius = VariableAmount.baseWithRandomAddition(2, 2);
+        this.count = VariableAmount.fixed(2);
         return this;
     }
 
     @Override
-    public EnderCrystalPlatform build() throws IllegalStateException {
-        EnderCrystalPlatform populator = (EnderCrystalPlatform) new WorldGenSpikes(Blocks.end_stone);
-        populator.setSpawnProbability(this.chance);
-        populator.setHeight(this.height);
-        populator.setRadius(this.radius);
-        return populator;
+    public IcePath build() throws IllegalStateException {
+        IcePath pop = (IcePath) new WorldGenIcePath(4);
+        pop.setRadius(this.radius);
+        pop.setSectionsPerChunk(this.count);
+        return pop;
     }
 
 }

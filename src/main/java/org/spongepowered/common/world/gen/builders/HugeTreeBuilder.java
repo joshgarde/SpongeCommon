@@ -24,20 +24,18 @@
  */
 package org.spongepowered.common.world.gen.builders;
 
-import org.spongepowered.common.world.gen.populators.HugeTreePopulator;
-
 import static com.google.common.base.Preconditions.checkNotNull;
-import org.spongepowered.api.world.gen.type.MushroomType;
+
 import com.google.common.collect.Lists;
 import org.spongepowered.api.util.VariableAmount;
 import org.spongepowered.api.util.weighted.WeightedObject;
+import org.spongepowered.api.world.gen.populator.HugeTree;
 import org.spongepowered.api.world.gen.populator.HugeTree.Builder;
 import org.spongepowered.api.world.gen.type.BiomeTreeType;
+import org.spongepowered.common.world.gen.populators.HugeTreePopulator;
 
 import java.util.Collection;
 import java.util.List;
-
-import org.spongepowered.api.world.gen.populator.HugeTree;
 
 
 public class HugeTreeBuilder implements HugeTree.Builder {
