@@ -25,13 +25,19 @@
 package org.spongepowered.common.interfaces.gen;
 
 import com.google.common.collect.ImmutableList;
+import org.spongepowered.api.world.biome.BiomeGenerationSettings;
+import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
 import org.spongepowered.api.world.gen.Populator;
+
+import java.util.Map;
 
 public interface IPopulatorOwner {
 
     ImmutableList<Populator> getPopulators();
 
     ImmutableList<GeneratorPopulator> getGeneratorPopulators();
+    
+    Map<BiomeType, BiomeGenerationSettings> getBiomeOverrides();
 
 }

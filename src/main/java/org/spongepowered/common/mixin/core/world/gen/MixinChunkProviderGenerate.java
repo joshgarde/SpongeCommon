@@ -24,10 +24,6 @@
  */
 package org.spongepowered.common.mixin.core.world.gen;
 
-import org.spongepowered.common.interfaces.gen.IFlaggedPopulator;
-
-import org.spongepowered.common.interfaces.gen.IPopulatorOwner;
-import org.spongepowered.common.world.gen.populators.AnimalPopulator;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import net.minecraft.block.BlockFalling;
@@ -60,6 +56,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.common.Sponge;
 import org.spongepowered.common.interfaces.IMixinWorld;
+import org.spongepowered.common.interfaces.gen.IFlaggedPopulator;
+import org.spongepowered.common.interfaces.gen.IPopulatorOwner;
+import org.spongepowered.common.world.gen.populators.AnimalPopulator;
 
 import java.util.List;
 import java.util.Random;
@@ -245,24 +244,34 @@ public abstract class MixinChunkProviderGenerate implements IChunkProvider, IPop
     @Override
     @Overwrite
     public void populate(IChunkProvider provider, int x, int z) {
-        BlockFalling.fallInstantly = true;
+//        BlockFalling.fallInstantly = true;
         BlockPos blockpos = new BlockPos(x * 16, 0, z * 16);
         BiomeGenBase biomegenbase = this.worldObj.getBiomeGenForCoords(blockpos.add(16, 0, 16));
         this.rand.setSeed(this.worldObj.getSeed());
         long seedRandX = this.rand.nextLong() / 2L * 2L + 1L;
         long seedRandZ = this.rand.nextLong() / 2L * 2L + 1L;
         this.rand.setSeed((long) x * seedRandX + (long) z * seedRandZ ^ this.worldObj.getSeed());
-        boolean villageFlag = false;
+//        boolean villageFlag = false;
 //        ChunkCoordIntPair chunkcoordintpair = new ChunkCoordIntPair(x, z);
 //        int k = x * 16;
 //        int l = z * 16;
         // BEGIN sponge
-        org.spongepowered.api.world.Chunk chunk = (org.spongepowered.api.world.Chunk) this.worldObj.getChunkFromChunkCoords(x, z);
-        List<Populator> populators = ((IMixinWorld) this.worldObj).getPopulators();
-        Sponge.getGame().getEventManager().post(SpongeEventFactory.createChunkPrePopulate(Sponge.getGame(), chunk, populators));
+        BiomeType biome = (BiomeType) this.worldObj.getBiomeGenForCoords(blockpos.add(16, 0, 16));
+        
+        IMixinWorld iworld = (IMixinWorld) this.worldObj;
 
+        // Calling the events makes the Sponge-added populators fire
+        org.spongepowered.api.world.Chunk chunk = (org.spongepowered.api.world.Chunk) this.worldObj.getChunkFromChunkCoords(x, z);
+        List<Populator> populators = iworld.getPopulators();
+        if(iworld.getBiomeOverrides().containsKey(biome)) {
+            populators.addAll(iworld.getBiomeOverrides().get(biome).getPopulators());
+        } else {
+            populators.addAll(biome.getGenerationSettings().getPopulators());
+        }
+        Sponge.getGame().getEventManager().post(SpongeEventFactory.createChunkPrePopulate(Sponge.getGame(), chunk, populators));
+        
         List<String> flags = Lists.newArrayList();
-        for (Populator populator : ((IMixinWorld) this.worldObj).getPopulators()) {
+        for (Populator populator : populators) {
             if (populator instanceof IFlaggedPopulator) {
                 ((IFlaggedPopulator) populator).populate(provider, chunk, this.rand, flags);
             } else {

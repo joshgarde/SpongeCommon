@@ -36,6 +36,8 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.boss.EntityDragonPart;
@@ -101,6 +103,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.api.world.WorldCreationSettings;
+import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.BiomeGenerator;
@@ -164,6 +167,7 @@ public abstract class MixinWorld implements World, IMixinWorld {
     private volatile Context worldContext;
     private ImmutableList<Populator> populators;
     private ImmutableList<GeneratorPopulator> generatorPopulators;
+    private ImmutableMap<BiomeType, BiomeGenerationSettings> biomeOverrides;
 
     protected SpongeScoreboard spongeScoreboard = new SpongeScoreboard();
 
@@ -653,7 +657,8 @@ public abstract class MixinWorld implements World, IMixinWorld {
                 SpongeBiomeGenerator.of(getWorldChunkManager()),
                 SpongeGeneratorPopulator.of(world, serverChunkProvider.serverChunkGenerator),
                 getGeneratorPopulators(),
-                getPopulators());
+                getPopulators(),
+                getBiomeOverrides());
     }
     
     @Override
@@ -696,6 +701,14 @@ public abstract class MixinWorld implements World, IMixinWorld {
             this.generatorPopulators = ImmutableList.of();
         }
         return this.generatorPopulators;
+    }
+    
+    @Override
+    public Map<BiomeType, BiomeGenerationSettings> getBiomeOverrides() {
+        if(this.biomeOverrides == null) {
+            this.biomeOverrides = ImmutableMap.of();
+        }
+        return this.biomeOverrides;
     }
 
     @Override

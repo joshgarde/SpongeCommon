@@ -43,6 +43,7 @@ import net.minecraft.world.gen.ChunkProviderGenerate;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.gen.BiomeGenerator;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
 import org.spongepowered.api.world.gen.Populator;
@@ -59,7 +60,7 @@ import java.util.Random;
  * Similar class to {@link ChunkProviderGenerate}, but instead gets its blocks
  * from a custom chunk generator.
  */
-public final class CustomChunkProviderGenerate implements IChunkProvider {
+public class CustomChunkProviderGenerate implements IChunkProvider {
 
     private static final Vector2i CHUNK_AREA = new Vector2i(16, 16);
 
@@ -113,24 +114,28 @@ public final class CustomChunkProviderGenerate implements IChunkProvider {
         BlockFalling.fallInstantly = true;
 
         BlockPos blockpos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
-        BiomeGenBase biomegenbase = this.world.getBiomeGenForCoords(blockpos.add(16, 0, 16));
+        BiomeType biome = (BiomeType) this.world.getBiomeGenForCoords(blockpos.add(16, 0, 16));
+
+        IMixinWorld iworld = (IMixinWorld) this.world;
 
         // Calling the events makes the Sponge-added populators fire
         org.spongepowered.api.world.Chunk chunk = (org.spongepowered.api.world.Chunk) this.world.getChunkFromChunkCoords(chunkX, chunkZ);
-        List<Populator> populators = ((IMixinWorld) this.world).getPopulators();
+        List<Populator> populators = iworld.getPopulators();
+        if (iworld.getBiomeOverrides().containsKey(biome)) {
+            populators.addAll(iworld.getBiomeOverrides().get(biome).getPopulators());
+        } else {
+            populators.addAll(biome.getGenerationSettings().getPopulators());
+        }
         Sponge.getGame().getEventManager().post(SpongeEventFactory.createChunkPrePopulate(Sponge.getGame(), chunk, populators));
 
         List<String> flags = Lists.newArrayList();
-        for (Populator populator : ((IMixinWorld) this.world).getPopulators()) {
+        for (Populator populator : populators) {
             if (populator instanceof IFlaggedPopulator) {
                 ((IFlaggedPopulator) populator).populate(chunkProvider, chunk, random, flags);
             } else {
                 populator.populate(chunk, random);
             }
         }
-        /*for (Populator populator : ((BiomeType) biomegenbase).getPopulators()) {
-            populator.populate(chunk, random);
-        }*/
 
         Sponge.getGame().getEventManager().post(SpongeEventFactory.createChunkPostPopulate(Sponge.getGame(), chunk));
 
