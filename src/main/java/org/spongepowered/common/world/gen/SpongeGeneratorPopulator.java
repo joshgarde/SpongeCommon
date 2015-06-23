@@ -129,9 +129,9 @@ public final class SpongeGeneratorPopulator implements GeneratorPopulator {
      * @param targetWorld The target world.
      * @return The chunk provider.
      * @throws IllegalArgumentException If the target world is not the world
-     *         this chunk provider is bound to.
+     *         this chunk provider is bound to.`
      */
-    IChunkProvider getHandle(World targetWorld) {
+    public IChunkProvider getHandle(World targetWorld) {
         if (!this.world.equals(targetWorld)) {
             throw new IllegalArgumentException("Cannot reassign internal generator from world "
                 + getWorldName(this.world) + " to world " + getWorldName(targetWorld));

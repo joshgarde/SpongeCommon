@@ -24,18 +24,15 @@
  */
 package org.spongepowered.common.world.gen.populators;
 
-import net.minecraft.world.World;
-
-import org.spongepowered.api.block.BlockTypes;
 import com.google.common.base.Predicate;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.util.VariableAmount;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.gen.populator.RandomBlock;
 
 import java.util.Random;
-
-import org.spongepowered.api.world.gen.populator.RandomBlock;
 
 public class RandomBlockPopulator implements RandomBlock {
 
@@ -43,7 +40,9 @@ public class RandomBlockPopulator implements RandomBlock {
 
         @Override
         public boolean apply(Location input) {
-            if (input.getState().getType() == BlockTypes.AIR && input.add(0, -1, 0).getState().getType() == BlockTypes.NETHERRACK) {
+            if (input.getBlock().getType().equals(BlockTypes.AIR)
+                    && input.add(0, -1, 0).getBlock().getType()
+                            .equals(BlockTypes.NETHERRACK)) {
                 return true;
             }
             return false;
@@ -55,33 +54,51 @@ public class RandomBlockPopulator implements RandomBlock {
 
         @Override
         public boolean apply(Location input) {
-            if (input.add(0, 1, 0).getState().getType() != BlockTypes.STONE || input.add(0, -1, 0).getState().getType() != BlockTypes.STONE
-                    || (input.getState().getType() != BlockTypes.STONE && input.getState().getType() != BlockTypes.AIR)) {
+            if (input.add(0, 1, 0).getBlock().getType() != BlockTypes.STONE
+                    || input.add(0, -1, 0).getBlock().getType() != BlockTypes.STONE
+                    || (input.getBlock().getType() != BlockTypes.STONE && input
+                            .getBlock().getType() != BlockTypes.AIR)) {
                 return false;
             }
             int air = 0;
             int stone = 0;
-            if (input.add(1, 0, 0).getState().getType() == BlockTypes.STONE || input.add(-1, 0, 0).getState().getType() == BlockTypes.STONE
-                    || input.add(0, 0, 1).getState().getType() == BlockTypes.STONE || input.add(0, 0, -1).getState().getType() == BlockTypes.STONE) {
+            if (input.add(1, 0, 0).getBlock().getType() == BlockTypes.STONE) {
                 stone++;
             }
-            if (input.add(1, 0, 0).getState().getType() == BlockTypes.AIR || input.add(-1, 0, 0).getState().getType() == BlockTypes.AIR
-                    || input.add(0, 0, 1).getState().getType() == BlockTypes.AIR || input.add(0, 0, -1).getState().getType() == BlockTypes.AIR) {
+            if (input.add(-1, 0, 0).getBlock().getType() == BlockTypes.STONE) {
+                stone++;
+            }
+            if (input.add(0, 0, 1).getBlock().getType() == BlockTypes.STONE) {
+                stone++;
+            }
+            if (input.add(0, 0, -1).getBlock().getType() == BlockTypes.STONE) {
+                stone++;
+            }
+            if (input.add(1, 0, 0).getBlock().getType() == BlockTypes.AIR) {
                 air++;
             }
-            if(air == 1 && stone == 3) {
+            if (input.add(-1, 0, 0).getBlock().getType() == BlockTypes.AIR) {
+                air++;
+            }
+            if (input.add(0, 0, 1).getBlock().getType() == BlockTypes.AIR) {
+                air++;
+            }
+            if (input.add(0, 0, -1).getBlock().getType() == BlockTypes.AIR) {
+                air++;
+            }
+            if (air == 1 && stone == 3) {
                 return true;
             }
             return false;
         }
 
     };
-    
+
     private VariableAmount count;
     private VariableAmount height;
     private Predicate<Location> check;
     private BlockState state;
-    
+
     public RandomBlockPopulator() {
         this.count = VariableAmount.fixed(64);
     }
@@ -89,10 +106,13 @@ public class RandomBlockPopulator implements RandomBlock {
     @Override
     public void populate(Chunk chunk, Random random) {
         int n = this.count.getFlooredAmount(random);
-        Location chunkMin = new Location(chunk.getWorld(), chunk.getBlockMin().getX(), chunk.getBlockMin().getY(), chunk.getBlockMin().getZ());
-        for(int i = 0; i < n; i++) {
-            Location pos = chunkMin.add(random.nextInt(16) + 8, this.height.getFlooredAmount(random), random.nextInt(16) + 8);
-            if(this.check.apply(pos)) {
+        Location chunkMin = new Location(chunk.getWorld(), chunk.getBlockMin()
+                .getX(), chunk.getBlockMin().getY(), chunk.getBlockMin().getZ());
+        for (int i = 0; i < n; i++) {
+            Location pos = chunkMin.add(random.nextInt(16) + 8,
+                    this.height.getFlooredAmount(random),
+                    random.nextInt(16) + 8);
+            if (this.check.apply(pos)) {
                 chunk.getWorld().setBlock(pos.getBlockPosition(), this.state);
             }
         }
