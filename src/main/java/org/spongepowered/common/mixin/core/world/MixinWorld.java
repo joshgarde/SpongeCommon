@@ -24,6 +24,8 @@
  */
 package org.spongepowered.common.mixin.core.world;
 
+import org.spongepowered.common.interfaces.gen.IPopulatorOwner;
+
 import org.spongepowered.common.world.gen.CustomChunkProviderGenerate;
 import org.spongepowered.common.world.gen.SpongeGeneratorPopulator;
 import org.spongepowered.common.world.gen.SpongeBiomeGenerator;

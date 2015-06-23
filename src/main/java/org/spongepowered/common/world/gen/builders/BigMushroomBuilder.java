@@ -73,8 +73,7 @@ public class BigMushroomBuilder implements BigMushroom.Builder {
 
     @Override
     public Builder mushroomsPerChunk(VariableAmount count) {
-        checkNotNull(count, "count");
-        this.count = count;
+        this.count = checkNotNull(count, "count");
         return this;
     }
 

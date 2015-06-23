@@ -24,72 +24,57 @@
  */
 package org.spongepowered.common.world.gen.builders;
 
+import net.minecraft.world.gen.feature.WorldGenGlowStone1;
+
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.Lists;
 import org.spongepowered.api.util.VariableAmount;
-import org.spongepowered.api.util.weighted.WeightedObject;
-import org.spongepowered.api.world.gen.populator.Forest;
-import org.spongepowered.api.world.gen.populator.Forest.Builder;
-import org.spongepowered.api.world.gen.type.BiomeTreeType;
-import org.spongepowered.common.world.gen.populators.ForestPopulator;
+import org.spongepowered.api.world.gen.populator.Glowstone.Builder;
+import org.spongepowered.api.world.gen.populator.Glowstone;
 
-import java.util.Collection;
-import java.util.List;
 
-public class ForestBuilder implements Forest.Builder {
+public class GlowstoneBuilder implements Glowstone.Builder {
     
     private VariableAmount count;
-    private List<WeightedObject<BiomeTreeType>> types;
+    private VariableAmount attempts;
+    private VariableAmount height;
     
-    public ForestBuilder() {
+    public GlowstoneBuilder() {
         reset();
     }
 
     @Override
     public Builder perChunk(VariableAmount count) {
-        this.count = count;
+        this.count = checkNotNull(count, "count");
         return this;
     }
 
     @Override
-    public Builder types(WeightedObject<BiomeTreeType>... types) {
-        checkNotNull(types, "types");
-        this.types.clear();
-        for (WeightedObject<BiomeTreeType> type : types) {
-            if (type != null) {
-                this.types.add(type);
-            }
-        }
+    public Builder blocksPerCluster(VariableAmount attempts) {
+        this.attempts = checkNotNull(attempts, "attempts");
         return this;
     }
 
     @Override
-    public Builder types(Collection<WeightedObject<BiomeTreeType>> types) {
-        checkNotNull(types, "types");
-        this.types.clear();
-        for (WeightedObject<BiomeTreeType> type : types) {
-            if (type != null) {
-                this.types.add(type);
-            }
-        }
+    public Builder heightRange(VariableAmount height) {
+        this.height = checkNotNull(height, "height");
         return this;
     }
 
     @Override
     public Builder reset() {
-        this.types = Lists.newArrayList();
-        this.count = VariableAmount.fixed(5);
+        this.count = VariableAmount.baseWithRandomAddition(1, 10);
+        this.attempts = VariableAmount.fixed(1500);
+        this.height = VariableAmount.baseWithRandomAddition(0, 12);
         return this;
     }
 
     @Override
-    public Forest build() throws IllegalStateException {
-        ForestPopulator pop = new ForestPopulator();
-        pop.setTreesPerChunk(this.count);
-        pop.getType().clear();
-        pop.getType().addAll(this.types);
-        return null;
+    public Glowstone build() throws IllegalStateException {
+        Glowstone pop = (Glowstone) new WorldGenGlowStone1();
+        pop.setAttemptsPerCluster(this.attempts);
+        pop.setClustersPerChunk(this.count);
+        pop.setHeightRange(this.height);
+        return pop;
     }
 
 }

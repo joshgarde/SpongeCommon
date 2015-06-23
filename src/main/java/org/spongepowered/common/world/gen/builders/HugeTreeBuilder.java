@@ -24,25 +24,28 @@
  */
 package org.spongepowered.common.world.gen.builders;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.spongepowered.common.world.gen.populators.HugeTreePopulator;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import org.spongepowered.api.world.gen.type.MushroomType;
 import com.google.common.collect.Lists;
 import org.spongepowered.api.util.VariableAmount;
 import org.spongepowered.api.util.weighted.WeightedObject;
-import org.spongepowered.api.world.gen.populator.Forest;
-import org.spongepowered.api.world.gen.populator.Forest.Builder;
+import org.spongepowered.api.world.gen.populator.HugeTree.Builder;
 import org.spongepowered.api.world.gen.type.BiomeTreeType;
-import org.spongepowered.common.world.gen.populators.ForestPopulator;
 
 import java.util.Collection;
 import java.util.List;
 
-public class ForestBuilder implements Forest.Builder {
+import org.spongepowered.api.world.gen.populator.HugeTree;
+
+
+public class HugeTreeBuilder implements HugeTree.Builder {
     
-    private VariableAmount count;
     private List<WeightedObject<BiomeTreeType>> types;
+    private VariableAmount count;
     
-    public ForestBuilder() {
+    public HugeTreeBuilder() {
         reset();
     }
 
@@ -53,7 +56,7 @@ public class ForestBuilder implements Forest.Builder {
     }
 
     @Override
-    public Builder types(WeightedObject<BiomeTreeType>... types) {
+    public Builder type(WeightedObject<BiomeTreeType>... types) {
         checkNotNull(types, "types");
         this.types.clear();
         for (WeightedObject<BiomeTreeType> type : types) {
@@ -65,7 +68,7 @@ public class ForestBuilder implements Forest.Builder {
     }
 
     @Override
-    public Builder types(Collection<WeightedObject<BiomeTreeType>> types) {
+    public Builder type(Collection<WeightedObject<BiomeTreeType>> types) {
         checkNotNull(types, "types");
         this.types.clear();
         for (WeightedObject<BiomeTreeType> type : types) {
@@ -79,17 +82,17 @@ public class ForestBuilder implements Forest.Builder {
     @Override
     public Builder reset() {
         this.types = Lists.newArrayList();
-        this.count = VariableAmount.fixed(5);
+        this.count = VariableAmount.fixed(1);
         return this;
     }
 
     @Override
-    public Forest build() throws IllegalStateException {
-        ForestPopulator pop = new ForestPopulator();
+    public HugeTree build() throws IllegalStateException {
+        HugeTree pop = new HugeTreePopulator();
         pop.setTreesPerChunk(this.count);
         pop.getType().clear();
         pop.getType().addAll(this.types);
-        return null;
+        return pop;
     }
 
 }

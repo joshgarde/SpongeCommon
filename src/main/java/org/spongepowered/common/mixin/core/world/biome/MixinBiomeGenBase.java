@@ -24,8 +24,9 @@
  */
 package org.spongepowered.common.mixin.core.world.biome;
 
-import org.spongepowered.api.util.VariableAmount;
+import com.google.common.base.Predicate;
 
+import org.spongepowered.api.util.VariableAmount;
 import com.google.common.collect.Lists;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -103,7 +104,14 @@ public abstract class MixinBiomeGenBase implements BiomeType {
                     .block(BlockTypes.SAND.getDefaultState())
                     .perChunk(VariableAmount.fixed(this.theBiomeDecorator.sandPerChunk2))
                     .radius(VariableAmount.fixed(7))
-                    .replace(BlockTypes.DIRT, BlockTypes.GRASS)
+                    .replace(new Predicate<BlockState>() {
+
+                        @Override
+                        public boolean apply(BlockState s) {
+                            return s.getType().equals(BlockTypes.DIRT) || s.getType().equals(BlockTypes.GRASS);
+                        }
+
+                    })
                     .build());
         }
         if (this.theBiomeDecorator.clayPerChunk > 0) {
@@ -111,7 +119,14 @@ public abstract class MixinBiomeGenBase implements BiomeType {
                     .block(BlockTypes.CLAY.getDefaultState())
                     .perChunk(VariableAmount.fixed(this.theBiomeDecorator.clayPerChunk))
                     .radius(VariableAmount.fixed(4))
-                    .replace(BlockTypes.DIRT, BlockTypes.CLAY)
+                    .replace(new Predicate<BlockState>() {
+
+                        @Override
+                        public boolean apply(BlockState s) {
+                            return s.getType().equals(BlockTypes.DIRT);
+                        }
+
+                    })
                     .build());
         }
         if (this.theBiomeDecorator.sandPerChunk > 0) {
@@ -119,7 +134,14 @@ public abstract class MixinBiomeGenBase implements BiomeType {
                     .block(BlockTypes.SAND.getDefaultState())
                     .perChunk(VariableAmount.fixed(this.theBiomeDecorator.sandPerChunk))
                     .radius(VariableAmount.fixed(6))
-                    .replace(BlockTypes.DIRT, BlockTypes.GRASS)
+                    .replace(new Predicate<BlockState>() {
+
+                        @Override
+                        public boolean apply(BlockState s) {
+                            return s.getType().equals(BlockTypes.DIRT) || s.getType().equals(BlockTypes.GRASS);
+                        }
+
+                    })
                     .build());
         }
         if (this.theBiomeDecorator.treesPerChunk > 0) {
