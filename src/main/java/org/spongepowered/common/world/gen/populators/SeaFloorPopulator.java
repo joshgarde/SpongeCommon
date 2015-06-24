@@ -24,6 +24,8 @@
  */
 package org.spongepowered.common.world.gen.populators;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.Predicate;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -54,11 +56,12 @@ public class SeaFloorPopulator implements SeaFloor {
     private Predicate<BlockState> check;
     private VariableAmount depth;
 
-    public SeaFloorPopulator() {
-        this.block = BlockTypes.SAND.getDefaultState();
-        this.radius = VariableAmount.fixed(7);
-        this.count = VariableAmount.fixed(3);
-        this.check = DIRT_AND_GRASS;
+    public SeaFloorPopulator(BlockState block, VariableAmount radius, VariableAmount count, VariableAmount depth, Predicate<BlockState> check) {
+        this.block = checkNotNull(block, "block");
+        this.radius = checkNotNull(radius, "radius");
+        this.count = checkNotNull(count, "count");
+        this.check = checkNotNull(check, "check");
+        this.depth = checkNotNull(depth, "depth");
     }
 
     @Override

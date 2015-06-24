@@ -154,26 +154,22 @@ public class SpongePopulatorFactory implements PopulatorFactory {
 
     @Override
     public SeaFloor.Builder createSeaFloorPopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new SeaFloorBuilder();
     }
 
     @Override
     public Shrub.Builder createShrubPopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new ShrubBuilder();
     }
 
     @Override
     public Vines.Builder createVinesPopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new VinesBuilder();
     }
 
     @Override
     public WaterLily.Builder createWaterLilyPopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new WaterLilyBuilder();
     }
 
 }
