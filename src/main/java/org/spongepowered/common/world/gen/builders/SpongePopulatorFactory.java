@@ -134,26 +134,22 @@ public class SpongePopulatorFactory implements PopulatorFactory {
 
     @Override
     public Pumpkin.Builder createPumpkinPopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new PumpkinBuilder();
     }
 
     @Override
     public RandomBlock.Builder createRandomBlockPopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new RandomBlockBuilder();
     }
 
     @Override
     public RandomObject.Builder createRandomObjectPopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new RandomObjectBuilder();
     }
 
     @Override
     public Reeds.Builder createReedsPopulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new ReedsBuilder();
     }
 
     @Override

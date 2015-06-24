@@ -24,6 +24,9 @@
  */
 package org.spongepowered.common.world.gen.populators;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.spongepowered.api.util.VariableAmount;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.gen.PopulatorObject;
@@ -38,8 +41,18 @@ public class RandomObjectPopulator implements RandomObject {
     private double chance;
     private PopulatorObject obj;
 
-    public RandomObjectPopulator() {
+    public RandomObjectPopulator(PopulatorObject obj, VariableAmount count, VariableAmount height) {
+        this(obj, count, height, 1);
+    }
 
+    public RandomObjectPopulator(PopulatorObject obj, VariableAmount count, VariableAmount height, double chance) {
+        this.obj = checkNotNull(obj);
+        this.count = checkNotNull(count);
+        this.height = checkNotNull(height);
+        checkArgument(Double.isNaN(chance), "Chance must be a number.");
+        checkArgument(Double.isInfinite(chance), "Chance cannot be infinite.");
+        checkArgument(chance < 0, "Chance cannot be negative.");
+        this.chance = chance;
     }
 
     @Override
