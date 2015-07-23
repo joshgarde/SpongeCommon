@@ -32,6 +32,7 @@ import org.apache.logging.log4j.spi.AbstractLogger;
 import org.slf4j.impl.SLF4JLogger;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.service.ProviderExistsException;
+import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.service.command.SimpleCommandService;
 import org.spongepowered.api.service.pagination.PaginationService;
@@ -47,6 +48,7 @@ import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.common.command.CommandSponge;
 import org.spongepowered.common.command.SpongeCommandDisambiguator;
 import org.spongepowered.common.registry.SpongeGameRegistry;
+import org.spongepowered.common.service.ban.SpongeBanService;
 import org.spongepowered.common.service.pagination.SpongePaginationService;
 import org.spongepowered.common.service.persistence.SpongeSerializationService;
 import org.spongepowered.common.service.profile.SpongeProfileResolver;
@@ -86,6 +88,7 @@ public final class SpongeBootstrap {
         }
         registerService(UserStorage.class, new SpongeUserStorage());
         registerService(GameProfileResolver.class, new SpongeProfileResolver());
+        registerService(BanService.class, new SpongeBanService());
     }
 
     private static <T> boolean registerService(Class<T> serviceClass, T serviceImpl) {

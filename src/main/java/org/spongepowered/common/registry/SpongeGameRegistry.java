@@ -237,6 +237,7 @@ import org.spongepowered.api.text.selector.Selectors;
 import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.util.ban.Bans;
 import org.spongepowered.api.util.rotation.Rotation;
 import org.spongepowered.api.util.rotation.Rotations;
 import org.spongepowered.api.world.Dimension;
@@ -256,6 +257,7 @@ import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
 import org.spongepowered.common.Sponge;
+import org.spongepowered.common.ban.SpongeBanFactory;
 import org.spongepowered.common.configuration.CatalogTypeTypeSerializer;
 import org.spongepowered.common.configuration.SpongeConfig;
 import org.spongepowered.common.data.SpongeImmutableRegistry;
@@ -1993,6 +1995,10 @@ public abstract class SpongeGameRegistry implements GameRegistry {
         RegistryHelper.mapFields(ShrubTypes.class, this.shrubTypeMappings);
     }
 
+    private void setBans() {
+        RegistryHelper.setFactory(Bans.class, new SpongeBanFactory());
+    }
+
     @Override
     public com.google.common.base.Optional<EntityStatistic> getEntityStatistic(StatisticGroup statisticGroup, EntityType entityType) {
         throw new UnsupportedOperationException(); // TODO
@@ -2072,6 +2078,7 @@ public abstract class SpongeGameRegistry implements GameRegistry {
         setCriteria();
         setObjectiveDisplayModes();
         setGeneratorTypes();
+        setBans();
     }
 
     public void postInit() {
