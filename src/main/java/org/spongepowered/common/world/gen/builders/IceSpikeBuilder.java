@@ -32,10 +32,10 @@ import org.spongepowered.api.util.VariableAmount;
 import org.spongepowered.api.world.gen.populator.IceSpike;
 import org.spongepowered.api.world.gen.populator.IceSpike.Builder;
 
-
 public class IceSpikeBuilder implements IceSpike.Builder {
-    
+
     private VariableAmount height;
+    private VariableAmount count;
     private double extremeChance;
     private VariableAmount extremeIncrease;
 
@@ -46,6 +46,12 @@ public class IceSpikeBuilder implements IceSpike.Builder {
     @Override
     public Builder height(VariableAmount height) {
         this.height = checkNotNull(height, "height");
+        return this;
+    }
+
+    @Override
+    public Builder spikesPerChunk(VariableAmount count) {
+        this.count = checkNotNull(count, "count");
         return this;
     }
 
@@ -66,6 +72,7 @@ public class IceSpikeBuilder implements IceSpike.Builder {
     @Override
     public Builder reset() {
         this.height = VariableAmount.baseWithRandomAddition(7, 4);
+        this.count = VariableAmount.fixed(3);
         this.extremeChance = 1 / 60d;
         this.extremeIncrease = VariableAmount.baseWithRandomAddition(10, 30);
         return this;
@@ -77,6 +84,7 @@ public class IceSpikeBuilder implements IceSpike.Builder {
         pop.setHeight(this.height);
         pop.setExtremeSpikeProbability(this.extremeChance);
         pop.setExtremeSpikeIncrease(this.extremeIncrease);
+        pop.setSpikesPerChunk(this.count);
         return pop;
     }
 

@@ -33,9 +33,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.util.gen.BiomeBuffer;
-import org.spongepowered.api.util.gen.MutableBlockBuffer;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.ImmutableBiomeArea;
+import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
 
 import java.util.Arrays;
@@ -59,7 +59,7 @@ public class MesaBiomeGeneratorPopulator implements GeneratorPopulator {
     }
 
     @Override
-    public void populate(World world, MutableBlockBuffer buffer, BiomeBuffer biomes) {
+    public void populate(World world, MutableBlockVolume buffer, ImmutableBiomeArea biomes) {
         long seed = world.getProperties().getSeed();
         if (this.possibleBlocks == null || this.lastSeed != seed) {
             this.func_150619_a(seed);
@@ -89,7 +89,7 @@ public class MesaBiomeGeneratorPopulator implements GeneratorPopulator {
 
     }
 
-    public void performOnColumn(Random p_180622_2_, MutableBlockBuffer p_180622_3_, int p_180622_4_, int p_180622_5_, double p_180622_6_) {
+    public void performOnColumn(Random p_180622_2_, MutableBlockVolume p_180622_3_, int p_180622_4_, int p_180622_5_, double p_180622_6_) {
         double d5 = 0.0D;
         int k;
         int l;

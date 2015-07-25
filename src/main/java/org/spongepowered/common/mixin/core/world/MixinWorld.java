@@ -37,7 +37,7 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.boss.EntityDragonPart;
@@ -130,8 +130,8 @@ import org.spongepowered.common.interfaces.IMixinWorld;
 import org.spongepowered.common.interfaces.IMixinWorldSettings;
 import org.spongepowered.common.interfaces.IMixinWorldType;
 import org.spongepowered.common.interfaces.block.IMixinBlock;
-import org.spongepowered.common.registry.SpongeGameRegistry;
 import org.spongepowered.common.interfaces.gen.IPopulatorOwner;
+import org.spongepowered.common.registry.SpongeGameRegistry;
 import org.spongepowered.common.scoreboard.SpongeScoreboard;
 import org.spongepowered.common.util.SpongeHooks;
 import org.spongepowered.common.util.VecHelper;
@@ -668,7 +668,7 @@ public abstract class MixinWorld implements World, IMixinWorld {
             return ((SpongeGeneratorPopulator) generatorPopulator).getHandle(world);
         }
         // Wrap a custom GeneratorPopulator implementation
-        return new CustomChunkProviderGenerate(world, generatorPopulator, biomeGenerator);
+        return CustomChunkProviderGenerate.of(world, biomeGenerator, generatorPopulator, new ArrayList<GeneratorPopulator>());
     }
 
     @Override

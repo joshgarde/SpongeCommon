@@ -24,11 +24,7 @@
  */
 package org.spongepowered.common.interfaces;
 
-import com.google.common.collect.ImmutableList;
-import org.spongepowered.common.interfaces.gen.IPopulatorOwner;
-
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.storage.WorldInfo;
 import org.spongepowered.api.world.gen.BiomeGenerator;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
 import org.spongepowered.common.configuration.SpongeConfig;
@@ -37,10 +33,6 @@ import org.spongepowered.common.interfaces.gen.IPopulatorOwner;
 public interface IMixinWorld extends IPopulatorOwner {
 
     SpongeConfig<SpongeConfig.WorldConfig> getWorldConfig();
-
-    ImmutableList<Populator> getPopulators();
-
-    ImmutableList<GeneratorPopulator> getGeneratorPopulators();
 
     void updateWorldGenerator();
     

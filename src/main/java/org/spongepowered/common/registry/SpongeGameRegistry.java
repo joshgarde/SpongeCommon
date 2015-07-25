@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.registry;
 
-import org.spongepowered.common.world.gen.builders.SpongePopulatorFactory;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
@@ -370,6 +370,7 @@ import org.spongepowered.common.weather.SpongeWeather;
 import org.spongepowered.common.world.SpongeDimensionType;
 import org.spongepowered.common.world.SpongeWorldBuilder;
 import org.spongepowered.common.world.gen.WorldGeneratorRegistry;
+import org.spongepowered.common.world.gen.builders.SpongePopulatorFactory;
 import org.spongepowered.common.world.type.SpongeWorldTypeEnd;
 import org.spongepowered.common.world.type.SpongeWorldTypeNether;
 import org.spongepowered.common.world.type.SpongeWorldTypeOverworld;

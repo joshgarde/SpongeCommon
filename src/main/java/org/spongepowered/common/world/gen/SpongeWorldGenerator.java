@@ -28,8 +28,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Optional;
-import org.spongepowered.api.world.biome.BiomeGenerationSettings;
-import org.spongepowered.api.world.biome.BiomeType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
@@ -69,8 +67,8 @@ public final class SpongeWorldGenerator implements WorldGenerator {
 
     public SpongeWorldGenerator(BiomeGenerator biomeGenerator, GeneratorPopulator baseGenerator,
             List<GeneratorPopulator> generatorPopulators, List<Populator> populators, Map<BiomeType, BiomeGenerationSettings> biomeOverrides) {
-        this.biomeGenerator = Preconditions.checkNotNull(biomeGenerator, "biomeGenerator");
-        this.baseGenerator = Preconditions.checkNotNull(baseGenerator, "baseGenerator");
+        this.biomeGenerator = checkNotNull(biomeGenerator, "biomeGenerator");
+        this.baseGenerator = checkNotNull(baseGenerator, "baseGenerator");
 
         // Note that ImmutableList.copyOf returns actually the list itself if it
         // is already immutable

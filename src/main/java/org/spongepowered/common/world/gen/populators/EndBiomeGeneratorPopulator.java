@@ -26,15 +26,15 @@ package org.spongepowered.common.world.gen.populators;
 
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.util.gen.BiomeBuffer;
-import org.spongepowered.api.util.gen.MutableBlockBuffer;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.ImmutableBiomeArea;
+import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
 
 public class EndBiomeGeneratorPopulator implements GeneratorPopulator {
 
     @Override
-    public void populate(World world, MutableBlockBuffer buffer, BiomeBuffer biomes) {
+    public void populate(World world, MutableBlockVolume buffer, ImmutableBiomeArea biomes) {
         BlockState iblockstate = BlockTypes.END_STONE.getDefaultState();
         for (int i = 0; i < 16; ++i) {
             int x = i + buffer.getBlockMin().getX();
