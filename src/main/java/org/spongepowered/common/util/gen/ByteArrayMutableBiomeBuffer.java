@@ -67,7 +67,7 @@ public final class ByteArrayMutableBiomeBuffer extends AbstractBiomeBuffer imple
         checkOpen();
         checkRange(x, z);
 
-        this.biomes[(x - this.start.getX()) | (z - this.start.getY()) << 4] = (byte) ((BiomeGenBase) biome).biomeID;
+        this.biomes[(x - this.start.getX()) + (z - this.start.getY()) * this.size.getX()] = (byte) ((BiomeGenBase) biome).biomeID;
     }
 
     public ImmutableBiomeArea getImmutableClone() {
@@ -123,7 +123,7 @@ public final class ByteArrayMutableBiomeBuffer extends AbstractBiomeBuffer imple
     public BiomeType getBiome(int x, int z) {
         checkOpen();
 
-        byte biomeId = this.biomes[(x - this.start.getX()) | (z - this.start.getY()) << 4];
+        byte biomeId = this.biomes[(x - this.start.getX()) + (z - this.start.getY()) * this.size.getX()];
         BiomeType biomeType = (BiomeType) this.biomeById[biomeId & 0xff];
         return biomeType == null ? BiomeTypes.OCEAN : biomeType;
     }

@@ -68,7 +68,7 @@ public final class ObjectArrayMutableBiomeBuffer extends AbstractBiomeBuffer imp
     @Override
     public BiomeType getBiome(int x, int z) {
         checkRange(x, z);
-        return (BiomeType) this.biomes[(x - this.start.getX()) | (z - this.start.getY()) << 4];
+        return (BiomeType) this.biomes[(x - this.start.getX()) + (z - this.start.getY()) * this.size.getX()];
     }
 
     @Override
@@ -80,6 +80,6 @@ public final class ObjectArrayMutableBiomeBuffer extends AbstractBiomeBuffer imp
     public void setBiome(int x, int z, BiomeType biome) {
         checkNotNull(biome, "biome");
         checkRange(x, z);
-        this.biomes[(x - this.start.getX()) | (z - this.start.getY()) << 4] = (BiomeGenBase) biome;
+        this.biomes[(x - this.start.getX()) + (z - this.start.getY()) * this.size.getX()] = (BiomeGenBase) biome;
     }
 }
