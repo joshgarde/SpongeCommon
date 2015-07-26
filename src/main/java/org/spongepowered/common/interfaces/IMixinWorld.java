@@ -24,18 +24,15 @@
  */
 package org.spongepowered.common.interfaces;
 
-import net.minecraft.world.chunk.IChunkProvider;
-import org.spongepowered.api.world.gen.BiomeGenerator;
-import org.spongepowered.api.world.gen.GeneratorPopulator;
 import org.spongepowered.common.configuration.SpongeConfig;
-import org.spongepowered.common.interfaces.gen.IPopulatorOwner;
+import org.spongepowered.common.world.gen.SpongeChunkProvider;
 
-public interface IMixinWorld extends IPopulatorOwner {
+public interface IMixinWorld {
 
     SpongeConfig<SpongeConfig.WorldConfig> getWorldConfig();
 
     void updateWorldGenerator();
     
-    IChunkProvider createChunkProvider(net.minecraft.world.World world, GeneratorPopulator generatorPopulator, BiomeGenerator biomeGenerator);
+    SpongeChunkProvider getSpongeChunkProvider();
 
 }

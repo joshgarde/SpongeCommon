@@ -55,8 +55,8 @@ public final class SpongeGeneratorPopulator implements GeneratorPopulator {
      * @return The generator populator.
      */
     public static GeneratorPopulator of(World world, IChunkProvider chunkGenerator) {
-        if (chunkGenerator instanceof CustomChunkProviderGenerate) {
-            return ((CustomChunkProviderGenerate) chunkGenerator).getBaseGenerator();
+        if (chunkGenerator instanceof SpongeChunkProvider) {
+            return ((SpongeChunkProvider) chunkGenerator).getBaseGenerator();
         }
         return new SpongeGeneratorPopulator(world, chunkGenerator);
     }

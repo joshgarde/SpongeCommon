@@ -37,7 +37,6 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.boss.EntityDragonPart;
@@ -130,16 +129,15 @@ import org.spongepowered.common.interfaces.IMixinWorld;
 import org.spongepowered.common.interfaces.IMixinWorldSettings;
 import org.spongepowered.common.interfaces.IMixinWorldType;
 import org.spongepowered.common.interfaces.block.IMixinBlock;
-import org.spongepowered.common.interfaces.gen.IPopulatorOwner;
 import org.spongepowered.common.registry.SpongeGameRegistry;
 import org.spongepowered.common.scoreboard.SpongeScoreboard;
 import org.spongepowered.common.util.SpongeHooks;
 import org.spongepowered.common.util.VecHelper;
 import org.spongepowered.common.world.DimensionManager;
 import org.spongepowered.common.world.border.PlayerBorderListener;
-import org.spongepowered.common.world.gen.CustomChunkProviderGenerate;
 import org.spongepowered.common.world.gen.CustomWorldChunkManager;
 import org.spongepowered.common.world.gen.SpongeBiomeGenerator;
+import org.spongepowered.common.world.gen.SpongeChunkProvider;
 import org.spongepowered.common.world.gen.SpongeGeneratorPopulator;
 import org.spongepowered.common.world.gen.SpongeWorldGenerator;
 import org.spongepowered.common.world.storage.SpongeChunkLayout;
@@ -165,9 +163,8 @@ public abstract class MixinWorld implements World, IMixinWorld {
     private boolean keepSpawnLoaded;
     public SpongeConfig<SpongeConfig.WorldConfig> worldConfig;
     private volatile Context worldContext;
-    private ImmutableList<Populator> populators;
-    private ImmutableList<GeneratorPopulator> generatorPopulators;
-    private ImmutableMap<BiomeType, BiomeGenerationSettings> biomeOverrides;
+    
+    private SpongeChunkProvider spongegen;
 
     protected SpongeScoreboard spongeScoreboard = new SpongeScoreboard();
 
@@ -620,8 +617,11 @@ public abstract class MixinWorld implements World, IMixinWorld {
             modifier.modifyWorldGenerator(creationSettings, generatorSettings, newGenerator);
         }
 
-        // Set this world generator
-        this.setWorldGenerator(newGenerator);
+        this.spongegen = new SpongeChunkProvider((net.minecraft.world.World) (Object) this, newGenerator.getBaseGeneratorPopulator(),
+                newGenerator.getBiomeGenerator());
+        this.spongegen.setGeneratorPopulators(newGenerator.getGeneratorPopulators());
+        this.spongegen.setPopulators(newGenerator.getPopulators());
+        this.spongegen.setBiomeOverrides(newGenerator.getBiomeOverrides());
     }
 
     @Override
@@ -631,13 +631,7 @@ public abstract class MixinWorld implements World, IMixinWorld {
         WorldServer thisWorld = (WorldServer) (Object) this;
         thisWorld.provider.worldChunkMgr = CustomWorldChunkManager.of(biomeGenerator);
 
-        // Replace generator populator with possibly modified one
-        GeneratorPopulator generatorPopulator = generator.getBaseGeneratorPopulator();
-        replaceChunkGenerator(createChunkProvider(thisWorld, generatorPopulator, biomeGenerator));
-
-        // Replace populators with possibly modified list
-        this.populators = ImmutableList.copyOf(generator.getPopulators());
-        this.generatorPopulators = ImmutableList.copyOf(generator.getGeneratorPopulators());
+        
     }
 
     private void replaceChunkGenerator(IChunkProvider provider) {
@@ -656,59 +650,9 @@ public abstract class MixinWorld implements World, IMixinWorld {
         return new SpongeWorldGenerator(
                 SpongeBiomeGenerator.of(getWorldChunkManager()),
                 SpongeGeneratorPopulator.of(world, serverChunkProvider.serverChunkGenerator),
-                getGeneratorPopulators(),
-                getPopulators(),
-                getBiomeOverrides());
-    }
-    
-    @Override
-    public IChunkProvider createChunkProvider(net.minecraft.world.World world, GeneratorPopulator generatorPopulator, BiomeGenerator biomeGenerator) {
-        if (generatorPopulator instanceof SpongeGeneratorPopulator) {
-            // Unwrap instead of wrap
-            return ((SpongeGeneratorPopulator) generatorPopulator).getHandle(world);
-        }
-        // Wrap a custom GeneratorPopulator implementation
-        return CustomChunkProviderGenerate.of(world, biomeGenerator, generatorPopulator, new ArrayList<GeneratorPopulator>());
-    }
-
-    @Override
-    public ImmutableList<Populator> getPopulators() {
-        if (this.populators == null) {
-            if (this.getChunkProvider() instanceof ChunkProviderServer) {
-                ChunkProviderServer cps = (ChunkProviderServer) this.getChunkProvider();
-                if (cps.serverChunkGenerator instanceof IPopulatorOwner) {
-                    this.populators = ((IPopulatorOwner) cps.serverChunkGenerator).getPopulators();
-                }
-            }
-        }
-        if (this.populators == null) {
-            this.populators = ImmutableList.of();
-        }
-        return this.populators;
-    }
-
-    @Override
-    public ImmutableList<GeneratorPopulator> getGeneratorPopulators() {
-        if (this.generatorPopulators == null) {
-            if (this.getChunkProvider() instanceof ChunkProviderServer) {
-                ChunkProviderServer cps = (ChunkProviderServer) this.getChunkProvider();
-                if (cps.serverChunkGenerator instanceof IPopulatorOwner) {
-                    this.generatorPopulators = ((IPopulatorOwner) cps.serverChunkGenerator).getGeneratorPopulators();
-                }
-            }
-        }
-        if (this.generatorPopulators == null) {
-            this.generatorPopulators = ImmutableList.of();
-        }
-        return this.generatorPopulators;
-    }
-    
-    @Override
-    public Map<BiomeType, BiomeGenerationSettings> getBiomeOverrides() {
-        if(this.biomeOverrides == null) {
-            this.biomeOverrides = ImmutableMap.of();
-        }
-        return this.biomeOverrides;
+                this.spongegen.getGeneratorPopulators(),
+                this.spongegen.getPopulators(),
+                this.spongegen.getBiomeOverrides());
     }
 
     @Override

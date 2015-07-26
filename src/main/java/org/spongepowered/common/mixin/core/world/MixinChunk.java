@@ -113,41 +113,6 @@ public abstract class MixinChunk implements Chunk {
         this.chunkCoordIntPair = new ChunkCoordIntPair(x, z);
     }
 
-    @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/world/chunk/ChunkPrimer;II)V", at = @At("RETURN"), remap = false)
-    public void onNewlyGenerated(World world, ChunkPrimer primer, int chunkX, int chunkZ, CallbackInfo ci) {
-        // The constructor with the ChunkPrimer in it is only used for newly
-        // generated chunks, so we can call the generator populators here
-
-        // Calling the generator populators here has the benefit that the chunk
-        // can be modified before light is calculated and that implementations
-        // of IChunkProvider provided by mods will very likely still work well
-
-        List<GeneratorPopulator> genpop = ((IMixinWorld) world).getGeneratorPopulators();
-        List<GeneratorPopulator> biomegenpop = Lists.newArrayList();
-
-        BiomeGenBase[] biomeArray = world.getWorldChunkManager().getBiomeGenAt(null, chunkX * 16, chunkZ * 16, 16, 16, true);
-        List<BiomeGenBase> encountered = Lists.newArrayList();
-        for (BiomeGenBase biome : biomeArray) {
-            if (encountered.contains(biome)) {
-                continue;
-            }
-            //TODO get from gen override
-            //biomegenpop.addAll(((BiomeType) biome).getGeneratorPopulators());
-            encountered.add(biome);
-        }
-
-        if (!genpop.isEmpty() || !biomegenpop.isEmpty()) {
-            FastChunkBuffer buffer = new FastChunkBuffer((net.minecraft.world.chunk.Chunk) (Object) this);
-            ImmutableBiomeArea biomes = new ObjectArrayImmutableBiomeBuffer(biomeArray, new Vector2i(chunkX * 16, chunkZ * 16), new Vector2i(16, 16));
-            for (GeneratorPopulator populator : biomegenpop) {
-                populator.populate((org.spongepowered.api.world.World) world, buffer, biomes);
-            }
-            for (GeneratorPopulator populator : genpop) {
-                populator.populate((org.spongepowered.api.world.World) world, buffer, biomes);
-            }
-        }
-    }
-
     @SideOnly(Side.SERVER)
     @Inject(method = "onChunkLoad()V", at = @At("RETURN"))
     public void onChunkLoadInject(CallbackInfo ci) {

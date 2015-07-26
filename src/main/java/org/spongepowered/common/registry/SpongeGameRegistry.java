@@ -246,6 +246,7 @@ import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.WorldBuilder;
+import org.spongepowered.api.world.biome.BiomeGenerationSettingsBuilder;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.difficulty.Difficulties;
@@ -480,9 +481,6 @@ public abstract class SpongeGameRegistry implements GameRegistry {
     public final Map<String, SpongeDisplaySlot> displaySlotMappings = Maps.newLinkedHashMap();
     public final Map<String, Criterion> criteriaMap = Maps.newHashMap();
     private final Map<String, SelectorType> selectorMappings = Maps.newHashMap();
-    
-    private final SpongePopulatorFactory populatorFactory = new SpongePopulatorFactory();
-
     private final Map<String, NotePitch> notePitchMappings = Maps.newHashMap();
     private final Map<String, SkullType> skullTypeMappings = Maps.newHashMap();
     private final Map<String, TreeType> treeTypeMappings = Maps.newHashMap();
@@ -600,6 +598,8 @@ public abstract class SpongeGameRegistry implements GameRegistry {
                     .put(GeneratorType.class, this.generatorTypeMappings)
                     .build();
     private final Map<Class<?>, Class<?>> builderMap = ImmutableMap.of(); // TODO FIGURE OUT HOW TO DO THIS!!?!
+    
+    private final SpongePopulatorFactory populatorFactory = new SpongePopulatorFactory();
 
     public com.google.common.base.Optional<PotionEffectType> getPotion(String id) {
         return com.google.common.base.Optional.fromNullable((PotionEffectType) Potion.getPotionFromResourceLocation(id));
@@ -2040,6 +2040,11 @@ public abstract class SpongeGameRegistry implements GameRegistry {
     @Override
     public PopulatorFactory getPopulatorFactory() {
         return this.populatorFactory;
+    }
+
+    @Override
+    public BiomeGenerationSettingsBuilder getBiomeGenerationSettingsBuilder() {
+        return null;
     }
 
     public void preInit() {

@@ -24,11 +24,8 @@
  */
 package org.spongepowered.common.mixin.core.world.gen;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import net.minecraft.block.BlockFalling;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
@@ -44,8 +41,6 @@ import net.minecraft.world.gen.structure.MapGenScatteredFeature;
 import net.minecraft.world.gen.structure.MapGenStronghold;
 import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
-import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
 import org.spongepowered.api.world.gen.Populator;
 import org.spongepowered.asm.mixin.Mixin;
@@ -54,17 +49,13 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.common.Sponge;
-import org.spongepowered.common.interfaces.IMixinWorld;
-import org.spongepowered.common.interfaces.gen.IFlaggedPopulator;
-import org.spongepowered.common.interfaces.gen.IPopulatorOwner;
 import org.spongepowered.common.world.gen.populators.AnimalPopulator;
 
 import java.util.List;
 import java.util.Random;
 
 @Mixin(ChunkProviderGenerate.class)
-public abstract class MixinChunkProviderGenerate implements IChunkProvider, IPopulatorOwner {
+public abstract class MixinChunkProviderGenerate implements IChunkProvider {
 
     // @formatter:off
 
@@ -89,17 +80,7 @@ public abstract class MixinChunkProviderGenerate implements IChunkProvider, IPop
     private List<Populator> populators;
     private List<GeneratorPopulator> genpopulators;
 
-    @Override
-    public ImmutableList<Populator> getPopulators() {
-        return ImmutableList.copyOf(this.populators);
-    }
-
-    @Override
-    public ImmutableList<GeneratorPopulator> getGeneratorPopulators() {
-        return ImmutableList.copyOf(this.genpopulators);
-    }
-
-    @Inject(method = "<init>(Lnet/minecraft/world/World;JZLjava/lang/String;)V", at = @At("RETURN"))
+    @Inject(method = "<init>(Lnet/minecraft/world/World;JZLjava/lang/String;)V", at = @At("RETURN") )
     public void onConstructed(World worldIn, long seed, boolean mapFeatures, String generatorOptions, CallbackInfo ci) {
         this.populators = Lists.newArrayList();
         this.genpopulators = Lists.newArrayList();
@@ -167,7 +148,7 @@ public abstract class MixinChunkProviderGenerate implements IChunkProvider, IPop
         }
 
         this.populators.add(new AnimalPopulator());
-        //this.populators.add(new SnowPopulator());
+        // this.populators.add(new SnowPopulator());
     }
 
     /**
@@ -231,140 +212,6 @@ public abstract class MixinChunkProviderGenerate implements IChunkProvider, IPop
 
         chunk.generateSkylightMap();
         return chunk;
-    }
-
-    /**
-     * @author Deamon
-     * 
-     *         This overwrites the populate method in order to remove the
-     *         standard calls to Populators as these Populators have instead
-     *         been added to the populator list from the injection into the
-     *         constructor {@link #onConstructed}.
-     */
-    @Override
-    @Overwrite
-    public void populate(IChunkProvider provider, int x, int z) {
-//        BlockFalling.fallInstantly = true;
-        BlockPos blockpos = new BlockPos(x * 16, 0, z * 16);
-        BiomeGenBase biomegenbase = this.worldObj.getBiomeGenForCoords(blockpos.add(16, 0, 16));
-        this.rand.setSeed(this.worldObj.getSeed());
-        long seedRandX = this.rand.nextLong() / 2L * 2L + 1L;
-        long seedRandZ = this.rand.nextLong() / 2L * 2L + 1L;
-        this.rand.setSeed((long) x * seedRandX + (long) z * seedRandZ ^ this.worldObj.getSeed());
-//        boolean villageFlag = false;
-//        ChunkCoordIntPair chunkcoordintpair = new ChunkCoordIntPair(x, z);
-//        int k = x * 16;
-//        int l = z * 16;
-        // BEGIN sponge
-        BiomeType biome = (BiomeType) this.worldObj.getBiomeGenForCoords(blockpos.add(16, 0, 16));
-        
-        IMixinWorld iworld = (IMixinWorld) this.worldObj;
-
-        // Calling the events makes the Sponge-added populators fire
-        org.spongepowered.api.world.Chunk chunk = (org.spongepowered.api.world.Chunk) this.worldObj.getChunkFromChunkCoords(x, z);
-        List<Populator> populators = iworld.getPopulators();
-        if(iworld.getBiomeOverrides().containsKey(biome)) {
-            populators.addAll(iworld.getBiomeOverrides().get(biome).getPopulators());
-        } else {
-            populators.addAll(biome.getGenerationSettings().getPopulators());
-        }
-        Sponge.getGame().getEventManager().post(SpongeEventFactory.createChunkPrePopulate(Sponge.getGame(), chunk, populators));
-        
-        List<String> flags = Lists.newArrayList();
-        for (Populator populator : populators) {
-            if (populator instanceof IFlaggedPopulator) {
-                ((IFlaggedPopulator) populator).populate(provider, chunk, this.rand, flags);
-            } else {
-                populator.populate(chunk, this.rand);
-            }
-        }
-        //TODO get pop from gen override
-        /*for (Populator populator : ((BiomeType) biomegenbase).getPopulators()) {
-            populator.populate(chunk, this.rand);
-        }*/
-        // END sponge
-        // BEGIN populator removal
-        // These populator calls are instead done by the reference to the
-        // populator list
-
-//        if (this.settings.useMineShafts && this.mapFeaturesEnabled) {
-//            this.mineshaftGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
-//        }
-
-//        if (this.settings.useVillages && this.mapFeaturesEnabled) {
-//            villageFlag = this.villageGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
-//        }
-
-//        if (this.settings.useStrongholds && this.mapFeaturesEnabled) {
-//            this.strongholdGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
-//        }
-
-//        if (this.settings.useTemples && this.mapFeaturesEnabled) {
-//            this.scatteredFeatureGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
-//        }
-
-//        if (this.settings.useMonuments && this.mapFeaturesEnabled) {
-//            this.oceanMonumentGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
-//        }
-
-//        int k1;
-//        int l1;
-//        int i2;
-//
-//        if (biomegenbase != BiomeGenBase.desert && biomegenbase != BiomeGenBase.desertHills && this.settings.useWaterLakes && !flag
-//                && this.rand.nextInt(this.settings.waterLakeChance) == 0 && TerrainGen.populate(chunk, worldObj, rand, x, z, flag, LAKE)) {
-//            k1 = this.rand.nextInt(16) + 8;
-//            l1 = this.rand.nextInt(256);
-//            i2 = this.rand.nextInt(16) + 8;
-//            (new WorldGenLakes(Blocks.water)).generate(this.worldObj, this.rand, blockpos.add(k1, l1, i2));
-//        }
-//        
-//        if (TerrainGen.populate(chunk, worldObj, rand, x, z, flag, LAVA) && !flag && this.rand.nextInt(this.settings.lavaLakeChance / 10) == 0
-//                && this.settings.useLavaLakes) {
-//            k1 = this.rand.nextInt(16) + 8;
-//            l1 = this.rand.nextInt(this.rand.nextInt(248) + 8);
-//            i2 = this.rand.nextInt(16) + 8;
-//
-//            if (l1 < 63 || this.rand.nextInt(this.settings.lavaLakeChance / 8) == 0) {
-//                (new WorldGenLakes(Blocks.lava)).generate(this.worldObj, this.rand, blockpos.add(k1, l1, i2));
-//            }
-//        }
-//        
-//        if (this.settings.useDungeons) {
-//            boolean doGen = TerrainGen.populate(chunk, worldObj, rand, x, z, flag, DUNGEON);
-//            for (k1 = 0; doGen && k1 < this.settings.dungeonChance; ++k1) {
-//                l1 = this.rand.nextInt(16) + 8;
-//                i2 = this.rand.nextInt(256);
-//                int j2 = this.rand.nextInt(16) + 8;
-//                (new WorldGenDungeons()).generate(this.worldObj, this.rand, blockpos.add(l1, i2, j2));
-//            }
-//        }
-
-//        biomegenbase.decorate(this.worldObj, this.rand, new BlockPos(k, 0, l));
-//        if (TerrainGen.populate(chunk, worldObj, rand, x, z, flag, ANIMALS)) {
-//            SpawnerAnimals.performWorldGenSpawning(this.worldObj, biomegenbase, k + 8, l + 8, 16, 16, this.rand);
-//        }
-//        blockpos = blockpos.add(8, 0, 8);
-
-//        boolean doGen = TerrainGen.populate(chunk, worldObj, rand, x, z, flag, ICE);
-//        for (k1 = 0; doGen && k1 < 16; ++k1) {
-//            for (l1 = 0; l1 < 16; ++l1) {
-//                BlockPos blockpos1 = this.worldObj.getPrecipitationHeight(blockpos.add(k1, 0, l1));
-//                BlockPos blockpos2 = blockpos1.down();
-//
-//                if (this.worldObj.func_175675_v(blockpos2)) {
-//                    this.worldObj.setBlockState(blockpos2, Blocks.ice.getDefaultState(), 2);
-//                }
-//
-//                if (this.worldObj.canSnowAt(blockpos1, true)) {
-//                    this.worldObj.setBlockState(blockpos1, Blocks.snow_layer.getDefaultState(), 2);
-//                }
-//            }
-//        }
-        // END populator removal
-        Sponge.getGame().getEventManager().post(SpongeEventFactory.createChunkPostPopulate(Sponge.getGame(), chunk));
-
-        BlockFalling.fallInstantly = false;
     }
 
 }

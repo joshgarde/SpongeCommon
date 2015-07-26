@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector2i;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.BlockPos;
@@ -43,6 +44,7 @@ import net.minecraft.world.gen.ChunkProviderGenerate;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.gen.BiomeGenerator;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
@@ -54,58 +56,118 @@ import org.spongepowered.common.util.gen.ByteArrayMutableBiomeBuffer;
 import org.spongepowered.common.util.gen.ChunkPrimerBuffer;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
  * Similar class to {@link ChunkProviderGenerate}, but instead gets its blocks
  * from a custom chunk generator.
  */
-public class CustomChunkProviderGenerate implements IChunkProvider {
+public class SpongeChunkProvider implements IChunkProvider {
 
     private static final Vector2i CHUNK_AREA = new Vector2i(16, 16);
 
-    private final BiomeGenerator biomeGenerator;
-    private final GeneratorPopulator baseGenerator;
-    private final List<GeneratorPopulator> generatorPopulators;
-    private final World world;
+    protected BiomeGenerator biomeGenerator;
+    protected GeneratorPopulator baseGenerator;
+    protected List<GeneratorPopulator> genpop;
+    protected List<Populator> pop;
+    protected Map<BiomeType, BiomeGenerationSettings> overrides;
+    protected final World world;
     private final ByteArrayMutableBiomeBuffer cachedBiomes;
 
-    /**
-     * Gets the chunk generator from the given generator populator and biome
-     * generator.
-     *
-     * @param world The world to bind the chunk provider to.
-     * @param biomeGenerator Biome generator used to generate chunks.
-     * @param baseGenerator The base generator
-     * @param generatorPopulators The generator populators
-     * @return The chunk generator.
-     * @throws IllegalArgumentException If the generator populator cannot be
-     *         bound to the given world.
-     */
-    public static IChunkProvider of(World world, BiomeGenerator biomeGenerator, GeneratorPopulator baseGenerator,
-        List<GeneratorPopulator> generatorPopulators) {
-        if (baseGenerator instanceof SpongeGeneratorPopulator) {
-            // Unwrap instead of wrap
-            return ((SpongeGeneratorPopulator) baseGenerator).getHandle(world);
-        }
-        // Wrap a custom GeneratorPopulator implementation
-        return new CustomChunkProviderGenerate(world, biomeGenerator, baseGenerator, generatorPopulators);
-    }
-
-    private CustomChunkProviderGenerate(World world, BiomeGenerator biomeGenerator, GeneratorPopulator baseGenerator,
-        List<GeneratorPopulator> generatorPopulators) {
+    public SpongeChunkProvider(World world, GeneratorPopulator base, BiomeGenerator biomegen) {
         this.world = checkNotNull(world, "world");
-        this.baseGenerator = checkNotNull(baseGenerator, "baseGenerator");
-        this.biomeGenerator = checkNotNull(biomeGenerator, "biomeGenerator");
-        this.generatorPopulators = checkNotNull(generatorPopulators, "generatorPopulators");
+        this.baseGenerator = checkNotNull(base, "baseGenerator");
+        this.biomeGenerator = checkNotNull(biomegen, "biomeGenerator");
 
         // Make initially empty biome cache
         this.cachedBiomes = new ByteArrayMutableBiomeBuffer(Vector2i.ZERO, CHUNK_AREA);
         this.cachedBiomes.detach();
+        
+        this.genpop = Lists.newArrayList();
+        this.pop = Lists.newArrayList();
+        this.overrides = Maps.newHashMap();
     }
 
     public GeneratorPopulator getBaseGenerator() {
         return this.baseGenerator;
+    }
+
+    public List<GeneratorPopulator> getGeneratorPopulators() {
+        return this.genpop;
+    }
+
+    public void setGeneratorPopulators(List<GeneratorPopulator> generatorPopulators) {
+        this.genpop = Lists.newArrayList(generatorPopulators);
+    }
+
+    public List<Populator> getPopulators() {
+        return this.pop;
+    }
+
+    public void setPopulators(List<Populator> populators) {
+        this.pop = Lists.newArrayList(populators);
+    }
+
+    public Map<BiomeType, BiomeGenerationSettings> getBiomeOverrides() {
+        return this.overrides;
+    }
+
+    public void setBiomeOverrides(Map<BiomeType, BiomeGenerationSettings> biomeOverrides) {
+        this.overrides = Maps.newHashMap(biomeOverrides);
+    }
+
+    @Override
+    public Chunk provideChunk(int chunkX, int chunkZ) {
+
+        this.cachedBiomes.reuse(new Vector2i(chunkX * 16, chunkZ * 16));
+        this.biomeGenerator.generateBiomes(this.cachedBiomes);
+
+        // Generate base terrain
+        ChunkPrimer chunkprimer = new ChunkPrimer();
+        MutableBlockVolume blockBuffer = new ChunkPrimerBuffer(chunkprimer, chunkX, chunkZ);
+        ImmutableBiomeArea biomeBuffer = this.cachedBiomes.getImmutableClone();
+        this.baseGenerator.populate((org.spongepowered.api.world.World) this.world, blockBuffer, biomeBuffer);
+
+        // Apply the generator populators to complete the blockBuffer
+        for (GeneratorPopulator populator : this.genpop) {
+            populator.populate((org.spongepowered.api.world.World) this.world, blockBuffer, biomeBuffer);
+        }
+        
+        //Get unique biomes to determine what generator populators to run
+        List<BiomeType> uniqueBiomes = Lists.newArrayList();
+        BiomeType biome;
+        for(int x = 0; x < 16; x++) {
+            for(int z = 0; z < 16; z++) {
+                biome = this.cachedBiomes.getBiome(x, z);
+                if(!uniqueBiomes.contains(biome)) {
+                    uniqueBiomes.add(biome);
+                }
+            }
+        }
+        
+        //run our generator populators, checking for overrides from the generator
+        for(BiomeType type: uniqueBiomes) {
+            if(this.overrides.containsKey(type)) {
+                for(GeneratorPopulator populator: this.overrides.get(type).getGeneratorPopulators()) {
+                    populator.populate((org.spongepowered.api.world.World) this.world, blockBuffer, biomeBuffer);
+                    
+                }
+            } else {
+                for(GeneratorPopulator populator: type.getGenerationSettings().getGeneratorPopulators()) {
+                    populator.populate((org.spongepowered.api.world.World) this.world, blockBuffer, biomeBuffer);
+                    
+                }
+            }
+        }
+
+        // Assemble chunk
+        Chunk chunk = new Chunk(this.world, chunkprimer, chunkX, chunkZ);
+        byte[] biomeArray = chunk.getBiomeArray();
+        System.arraycopy(this.cachedBiomes.detach(), 0, biomeArray, 0, biomeArray.length);
+        chunk.generateSkylightMap();
+
+        return chunk;
     }
 
     @Override
@@ -120,9 +182,10 @@ public class CustomChunkProviderGenerate implements IChunkProvider {
 
         // Calling the events makes the Sponge-added populators fire
         org.spongepowered.api.world.Chunk chunk = (org.spongepowered.api.world.Chunk) this.world.getChunkFromChunkCoords(chunkX, chunkZ);
-        List<Populator> populators = iworld.getPopulators();
-        if (iworld.getBiomeOverrides().containsKey(biome)) {
-            populators.addAll(iworld.getBiomeOverrides().get(biome).getPopulators());
+        
+        List<Populator> populators = Lists.newArrayList(this.pop);
+        if (this.overrides.containsKey(biome)) {
+            populators.addAll(this.overrides.get(biome).getPopulators());
         } else {
             populators.addAll(biome.getGenerationSettings().getPopulators());
         }
@@ -158,39 +221,13 @@ public class CustomChunkProviderGenerate implements IChunkProvider {
 
     @Override
     public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position) {
-        // Maybe allow to register stronghold locations?
+        // TODO Maybe allow to register stronghold locations?
         return null;
     }
 
     @Override
     public void recreateStructures(Chunk chunk, int chunkX, int chunkZ) {
-        // No structure support
-    }
-
-    @Override
-    public Chunk provideChunk(int chunkX, int chunkZ) {
-
-        this.cachedBiomes.reuse(new Vector2i(chunkX * 16, chunkZ * 16));
-        this.biomeGenerator.generateBiomes(this.cachedBiomes);
-
-        // Generate base terrain
-        ChunkPrimer chunkprimer = new ChunkPrimer();
-        MutableBlockVolume blockBuffer = new ChunkPrimerBuffer(chunkprimer, chunkX, chunkZ);
-        ImmutableBiomeArea biomeBuffer = this.cachedBiomes.getImmutableClone();
-        this.baseGenerator.populate((org.spongepowered.api.world.World) this.world, blockBuffer, biomeBuffer);
-
-        // Apply the generator populators to complete the blockBuffer
-        for (GeneratorPopulator populator : this.generatorPopulators) {
-            populator.populate((org.spongepowered.api.world.World) this.world, blockBuffer, biomeBuffer);
-        }
-
-        // Assemble chunk
-        Chunk chunk = new Chunk(this.world, chunkprimer, chunkX, chunkZ);
-        byte[] biomeArray = chunk.getBiomeArray();
-        System.arraycopy(this.cachedBiomes.detach(), 0, biomeArray, 0, biomeArray.length);
-        chunk.generateSkylightMap();
-
-        return chunk;
+        // TODO No structure support
     }
 
     // Methods below are simply mirrors of the methods in ChunkProviderGenerate
