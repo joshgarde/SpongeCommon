@@ -622,6 +622,9 @@ public abstract class MixinWorld implements World, IMixinWorld {
         this.spongegen.setGeneratorPopulators(newGenerator.getGeneratorPopulators());
         this.spongegen.setPopulators(newGenerator.getPopulators());
         this.spongegen.setBiomeOverrides(newGenerator.getBiomeOverrides());
+        
+        ChunkProviderServer chunkProviderServer = (ChunkProviderServer) this.getChunkProvider();
+        chunkProviderServer.serverChunkGenerator = this.spongegen;
     }
 
     @Override
@@ -630,13 +633,13 @@ public abstract class MixinWorld implements World, IMixinWorld {
         BiomeGenerator biomeGenerator = generator.getBiomeGenerator();
         WorldServer thisWorld = (WorldServer) (Object) this;
         thisWorld.provider.worldChunkMgr = CustomWorldChunkManager.of(biomeGenerator);
-
         
-    }
-
-    private void replaceChunkGenerator(IChunkProvider provider) {
-        ChunkProviderServer chunkProviderServer = (ChunkProviderServer) this.getChunkProvider();
-        chunkProviderServer.serverChunkGenerator = provider;
+        SpongeWorldGenerator sgen = (SpongeWorldGenerator) generator;
+        
+        this.spongegen.setBiomeOverrides(sgen.getBiomeOverrides());
+        this.spongegen.setGeneratorPopulators(sgen.getGeneratorPopulators());
+        this.spongegen.setPopulators(sgen.getPopulators());
+        this.spongegen.setBaseGeneratorPopulator(sgen.getBaseGeneratorPopulator());
     }
 
     @Override

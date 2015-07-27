@@ -27,7 +27,7 @@ package org.spongepowered.common.world.gen;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector2i;
-import com.google.common.base.Preconditions;
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.block.BlockFalling;
@@ -41,14 +41,15 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.ChunkProviderGenerate;
-import org.spongepowered.api.world.extent.ImmutableBiomeArea;
-import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.extent.ImmutableBiomeArea;
+import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.gen.BiomeGenerator;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
 import org.spongepowered.api.world.gen.Populator;
+import org.spongepowered.api.world.gen.WorldGenerator;
 import org.spongepowered.common.Sponge;
 import org.spongepowered.common.interfaces.IMixinWorld;
 import org.spongepowered.common.interfaces.gen.IFlaggedPopulator;
@@ -63,7 +64,7 @@ import java.util.Random;
  * Similar class to {@link ChunkProviderGenerate}, but instead gets its blocks
  * from a custom chunk generator.
  */
-public class SpongeChunkProvider implements IChunkProvider {
+public class SpongeChunkProvider implements WorldGenerator, IChunkProvider {
 
     private static final Vector2i CHUNK_AREA = new Vector2i(16, 16);
 
@@ -89,10 +90,17 @@ public class SpongeChunkProvider implements IChunkProvider {
         this.overrides = Maps.newHashMap();
     }
 
-    public GeneratorPopulator getBaseGenerator() {
+    @Override
+    public GeneratorPopulator getBaseGeneratorPopulator() {
         return this.baseGenerator;
     }
 
+    @Override
+    public void setBaseGeneratorPopulator(GeneratorPopulator baseGeneratorPopulator) {
+        this.baseGenerator = baseGeneratorPopulator;
+    }
+
+    @Override
     public List<GeneratorPopulator> getGeneratorPopulators() {
         return this.genpop;
     }
@@ -101,6 +109,7 @@ public class SpongeChunkProvider implements IChunkProvider {
         this.genpop = Lists.newArrayList(generatorPopulators);
     }
 
+    @Override
     public List<Populator> getPopulators() {
         return this.pop;
     }
@@ -115,6 +124,31 @@ public class SpongeChunkProvider implements IChunkProvider {
 
     public void setBiomeOverrides(Map<BiomeType, BiomeGenerationSettings> biomeOverrides) {
         this.overrides = Maps.newHashMap(biomeOverrides);
+    }
+
+    @Override
+    public BiomeGenerator getBiomeGenerator() {
+        return this.biomeGenerator;
+    }
+
+    @Override
+    public void setBiomeGenerator(BiomeGenerator biomeGenerator) {
+        this.biomeGenerator = biomeGenerator;
+    }
+
+    @Override
+    public Optional<BiomeGenerationSettings> getBiomeOverride(BiomeType type) {
+        return Optional.fromNullable(this.overrides.get(type));
+    }
+
+    @Override
+    public boolean isBiomeOverriden(BiomeType type) {
+        return this.overrides.containsKey(type);
+    }
+
+    @Override
+    public void setBiomeOverride(BiomeType type, BiomeGenerationSettings settings) {
+        this.overrides.put(type, settings);
     }
 
     @Override
