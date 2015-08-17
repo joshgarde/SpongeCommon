@@ -11,12 +11,6 @@ ext {
 }
 
 minecraft {
-    if (project.ext.has('forgeVersion')) {
-        version = "1.8-$forgeVersion"
-    } else {
-        version = '1.8'
-    }
-
     mappings = 'snapshot_20150301'
     runDir = 'run'
 }
@@ -47,6 +41,10 @@ deobfMcMCP { failOnAtError = false }
 deobfMcSRG { failOnAtError = false }
 
 plugins.withId('net.minecraftforge.gradle.tweaker-server') {
+    minecraft {
+        version = '1.8'
+    }
+
     // Add access transformer
     sourceSets.main.resources.files.each {
         if (it.name.endsWith('_at.cfg')) {
