@@ -43,18 +43,18 @@ setupDecompWorkspace.dependsOn copySrgs
 setupDevWorkspace.dependsOn copySrgs
 compileJava.dependsOn copySrgs
 
-// Add Common access transformer
-sourceSets.main.resources.files.each {
-    if (it.name.endsWith('_at.cfg')) {
-        logger.lifecycle("Found AccessTransformer in main resources: $it.name")
-        minecraft.at it
-    }
-}
-
 deobfMcMCP { failOnAtError = false }
 deobfMcSRG { failOnAtError = false }
 
 plugins.withId('net.minecraftforge.gradle.tweaker-server') {
+    // Add access transformer
+    sourceSets.main.resources.files.each {
+        if (it.name.endsWith('_at.cfg')) {
+            logger.lifecycle("Found AccessTransformer in main resources: $it.name")
+            minecraft.at it
+        }
+    }
+
     afterEvaluate {
         reobfJar.primarySrg = minecraftPlugin.delayedFile('{SRG_DIR}/mcp-srg.srg')
     }
