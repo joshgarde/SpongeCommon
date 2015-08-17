@@ -56,7 +56,7 @@ deobfMcSRG { failOnAtError = false }
 // Configure reobfuscation for mixins
 reobfJar.doFirst {
     if (project.mixinSrg.exists()) {
-        addExtraSrgFile project.mixinSrg
+        addSecondarySrgFile project.mixinSrg
     }
 }
 
