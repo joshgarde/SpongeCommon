@@ -38,8 +38,8 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
 
     @Shadow private boolean guiIsEnabled;
 
-    public MixinDedicatedServer(Proxy proxy, File workDir) {
-        super(proxy, workDir);
+    public MixinDedicatedServer() {
+        super(null, null, null);
     }
 
     /**

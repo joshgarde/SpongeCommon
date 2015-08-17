@@ -41,8 +41,6 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.storage.AnvilSaveHandler;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
@@ -119,11 +117,11 @@ public abstract class MixinMinecraftServer implements Server, ConsoleSource, IMi
     @Shadow protected abstract void setResourcePackFromWorld(String worldNameIn, ISaveHandler saveHandlerIn);
 
     @Shadow
-    @SideOnly(Side.SERVER)
+    //@SideOnly(Side.SERVER)
     public abstract String getServerHostname();
 
     @Shadow
-    @SideOnly(Side.SERVER)
+    //@SideOnly(Side.SERVER)
     public abstract int getPort();
 
     @Override

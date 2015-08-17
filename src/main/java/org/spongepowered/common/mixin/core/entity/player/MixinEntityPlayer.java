@@ -69,7 +69,8 @@ public abstract class MixinEntityPlayer extends MixinEntityLivingBase implements
     }
 
     public void setSaturation(double saturation) {
-        this.getFoodStats().setFoodSaturationLevel((float) saturation);
+        // TODO: This is client-only
+        //this.getFoodStats().setFoodSaturationLevel((float) saturation);
     }
 
     public double getFoodLevel() {
