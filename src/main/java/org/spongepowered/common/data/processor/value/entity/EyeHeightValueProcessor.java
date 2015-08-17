@@ -35,16 +35,16 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.common.data.ValueProcessor;
+import org.spongepowered.common.data.processor.value.AbstractSpongeProcessor;
 import org.spongepowered.common.data.value.immutable.ImmutableSpongeValue;
 import org.spongepowered.common.data.value.mutable.SpongeValue;
 import org.spongepowered.common.interfaces.IMixinEntity;
 
 @SuppressWarnings("ConstantConditions")
-public class EyeHeightValueProcessor implements ValueProcessor<Double, Value<Double>> {
+public class EyeHeightValueProcessor extends AbstractSpongeProcessor<Double, Value<Double>> {
 
-    @Override
-    public Key<? extends BaseValue<Double>> getKey() {
-        return Keys.EYE_HEIGHT;
+    public EyeHeightValueProcessor() {
+        super(Keys.EYE_HEIGHT);
     }
 
     @Override

@@ -40,15 +40,15 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.common.data.ImmutableDataCachingUtil;
 import org.spongepowered.common.data.ValueProcessor;
+import org.spongepowered.common.data.processor.value.AbstractSpongeProcessor;
 import org.spongepowered.common.data.value.immutable.ImmutableSpongeValue;
 import org.spongepowered.common.data.value.mutable.SpongeValue;
 import org.spongepowered.common.interfaces.entity.IMixinVillager;
 
-public class CareerValueProcessor implements ValueProcessor<Career, Value<Career>> {
+public class CareerValueProcessor extends AbstractSpongeProcessor<Career, Value<Career>> {
 
-    @Override
-    public Key<? extends BaseValue<Career>> getKey() {
-        return Keys.CAREER;
+    public CareerValueProcessor() {
+        super(Keys.CAREER);
     }
 
     @Override

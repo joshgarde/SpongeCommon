@@ -50,11 +50,10 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 import org.spongepowered.common.interfaces.data.IMixinCustomNameable;
 
 @SuppressWarnings("deprecation")
-public class DisplayNameValueProcessor implements ValueProcessor<Text, Value<Text>> {
+public class DisplayNameValueProcessor extends AbstractSpongeProcessor<Text, Value<Text>> {
 
-    @Override
-    public Key<? extends BaseValue<Text>> getKey() {
-        return Keys.DISPLAY_NAME;
+    public DisplayNameValueProcessor() {
+        super(Keys.DISPLAY_NAME);
     }
 
     @Override

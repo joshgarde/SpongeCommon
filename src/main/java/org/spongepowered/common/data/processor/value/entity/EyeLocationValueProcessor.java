@@ -36,16 +36,16 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.common.data.ValueProcessor;
+import org.spongepowered.common.data.processor.value.AbstractSpongeProcessor;
 import org.spongepowered.common.data.value.immutable.ImmutableSpongeValue;
 import org.spongepowered.common.data.value.mutable.SpongeValue;
 import org.spongepowered.common.interfaces.IMixinEntity;
 
 @SuppressWarnings("ConstantConditions")
-public class EyeLocationValueProcessor implements ValueProcessor<Vector3d, Value<Vector3d>> {
+public class EyeLocationValueProcessor extends AbstractSpongeProcessor<Vector3d, Value<Vector3d>> {
 
-    @Override
-    public Key<? extends BaseValue<Vector3d>> getKey() {
-        return Keys.EYE_LOCATION;
+    public EyeLocationValueProcessor() {
+        super(Keys.EYE_LOCATION);
     }
 
     @Override

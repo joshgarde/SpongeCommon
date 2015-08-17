@@ -45,11 +45,10 @@ import org.spongepowered.common.data.processor.common.SkullUtils;
 import org.spongepowered.common.data.type.SpongeSkullType;
 import org.spongepowered.common.data.value.mutable.SpongeValue;
 
-public class SkullValueProcessor implements ValueProcessor<SkullType, Value<SkullType>> {
+public class SkullValueProcessor extends AbstractSpongeProcessor<SkullType, Value<SkullType>> {
 
-    @Override
-    public Key<? extends BaseValue<SkullType>> getKey() {
-        return Keys.SKULL_TYPE;
+    public SkullValueProcessor() {
+        super(Keys.SKULL_TYPE);
     }
 
     @Override

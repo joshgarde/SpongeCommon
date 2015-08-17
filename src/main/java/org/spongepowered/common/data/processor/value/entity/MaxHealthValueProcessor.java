@@ -40,15 +40,15 @@ import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.immutable.ImmutableBoundedValue;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.common.data.ValueProcessor;
+import org.spongepowered.common.data.processor.value.AbstractSpongeProcessor;
 import org.spongepowered.common.data.value.immutable.ImmutableSpongeBoundedValue;
 import org.spongepowered.common.data.value.mutable.SpongeBoundedValue;
 import org.spongepowered.common.data.value.mutable.SpongeValue;
 
-public class MaxHealthValueProcessor implements ValueProcessor<Double, MutableBoundedValue<Double>> {
+public class MaxHealthValueProcessor extends AbstractSpongeProcessor<Double, MutableBoundedValue<Double>> {
 
-    @Override
-    public Key<? extends BaseValue<Double>> getKey() {
-        return Keys.MAX_HEALTH;
+    public MaxHealthValueProcessor() {
+        super(Keys.MAX_HEALTH);
     }
 
     @Override

@@ -43,11 +43,10 @@ import org.spongepowered.common.data.ValueProcessor;
 import org.spongepowered.common.data.value.immutable.ImmutableSpongeValue;
 import org.spongepowered.common.data.value.mutable.SpongeValue;
 
-public class DisplayNameVisibleValueProcessor implements ValueProcessor<Boolean, Value<Boolean>> {
+public class DisplayNameVisibleValueProcessor extends AbstractSpongeProcessor<Boolean, Value<Boolean>> {
 
-    @Override
-    public Key<? extends BaseValue<Boolean>> getKey() {
-        return Keys.SHOWS_DISPLAY_NAME;
+    public DisplayNameVisibleValueProcessor() {
+        super(Keys.SHOWS_DISPLAY_NAME);
     }
 
     @Override

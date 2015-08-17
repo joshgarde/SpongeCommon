@@ -39,14 +39,14 @@ import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.common.data.ValueProcessor;
+import org.spongepowered.common.data.processor.value.AbstractSpongeProcessor;
 import org.spongepowered.common.data.value.immutable.ImmutableSpongeValue;
 import org.spongepowered.common.data.value.mutable.SpongeValue;
 
-public class VelocityValueProcessor implements ValueProcessor<Vector3d, Value<Vector3d>> {
+public class VelocityValueProcessor extends AbstractSpongeProcessor<Vector3d, Value<Vector3d>> {
 
-    @Override
-    public Key<? extends BaseValue<Vector3d>> getKey() {
-        return Keys.VELOCITY;
+    public VelocityValueProcessor() {
+        super(Keys.VELOCITY);
     }
 
     @Override
