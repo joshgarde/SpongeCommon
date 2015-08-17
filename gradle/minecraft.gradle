@@ -18,6 +18,7 @@ minecraft {
     }
 
     mappings = 'snapshot_20150301'
+    runDir = 'run'
 }
 
 // Compile options
@@ -32,7 +33,7 @@ compileJava {
 
 // Copy the current srgs to the build dir so the user doesn't have to go hunting for them
 task copySrgs(type: Copy, dependsOn: 'genSrgs') {
-    from minecraftPlugin.delayedFile("$Constants.DIR_MCP_MAPPINGS/srgs")
+    from minecraftPlugin.delayedFile('{SRG_DIR}')
 
     include '**/*.srg'
     into 'build/srgs'
@@ -52,6 +53,12 @@ sourceSets.main.resources.files.each {
 
 deobfMcMCP { failOnAtError = false }
 deobfMcSRG { failOnAtError = false }
+
+plugins.withId('net.minecraftforge.gradle.tweaker-server') {
+    afterEvaluate {
+        reobfJar.primarySrg = minecraftPlugin.delayedFile('{SRG_DIR}/mcp-srg.srg')
+    }
+}
 
 // Configure reobfuscation for mixins
 reobfJar.doFirst {

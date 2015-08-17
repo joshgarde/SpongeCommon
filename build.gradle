@@ -16,11 +16,10 @@ version = '0.1-SNAPSHOT' // TODO: ???
 ext.common = project
 apply plugin: 'net.minecraftforge.gradle.tweaker-server'
 ext.minecraftPlugin = plugins.getPlugin('net.minecraftforge.gradle.tweaker-server')
-ext.Constants = net.minecraftforge.gradle.common.Constants
+net.minecraftforge.gradle.util.delayed.TokenReplacer.putReplacement('SRG_DIR', "$net.minecraftforge.gradle.common.Constants.DIR_MCP_MAPPINGS/srgs")
 
 minecraft {
     tweakClass = 'null'
-    runDir = 'run'
 }
 apply from: 'gradle/minecraft.gradle'
 
